@@ -334,48 +334,37 @@ function enhanceMobileMenu() {
     });
 }
 
-// Initialize all enhancements
-document.addEventListener('DOMContentLoaded', () => {
-    // Hero background carousel
+// Deferred initialization to run after loading screen hides
+function startHeroCarousel() {
     const heroBgCarousel = document.querySelector('.hero-bg-carousel');
-    if (heroBgCarousel) {
-        const images = [
-            '../images/Kandy1.jpeg',
-            '../images/Kandy2.jpg',
-            '../images/Kandy3.jpg'
-        ];
-        let current = 0;
-        // Create image elements
-        images.forEach((src, idx) => {
-            const img = document.createElement('img');
-            img.src = src;
-            img.className = 'carousel-image' + (idx === 0 ? ' active' : '');
-            heroBgCarousel.appendChild(img);
-        });
-        const imgEls = heroBgCarousel.querySelectorAll('.carousel-image');
-        setInterval(() => {
-            imgEls[current].classList.remove('active');
-            current = (current + 1) % images.length;
-            imgEls[current].classList.add('active');
-        }, 4000);
-    }
+    if (!heroBgCarousel) return;
+    const images = [
+        '../images/Kandy1.jpeg',
+        '../images/Kandy2.jpg',
+        '../images/Kandy3.jpg'
+    ];
+    let current = 0;
+    images.forEach((src, idx) => {
+        const img = document.createElement('img');
+        img.src = src;
+        img.className = 'carousel-image' + (idx === 0 ? ' active' : '');
+        heroBgCarousel.appendChild(img);
+    });
+    const imgEls = heroBgCarousel.querySelectorAll('.carousel-image');
+    setInterval(() => {
+        imgEls[current].classList.remove('active');
+        current = (current + 1) % images.length;
+        imgEls[current].classList.add('active');
+    }, 4000);
+}
 
-    // Hide loading screen after page loads
-    setTimeout(() => {
-        const loadingScreen = document.querySelector('.loading-screen');
-        if (loadingScreen) {
-            loadingScreen.classList.add('hidden');
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 500);
-        }
-    }, 1500);
-    
+function initAppEnhancements() {
+    startHeroCarousel();
     createScrollToTopButton();
     setupAnimations();
     enhanceMobileMenu();
-    
-    // Add loading states to buttons
+
+    // Button tap feedback
     document.querySelectorAll('.btn').forEach(btn => {
         btn.addEventListener('click', function() {
             if (this.classList.contains('btn-primary') || this.classList.contains('btn-secondary')) {
@@ -386,17 +375,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
-    // Add hover effects to project cards
+
+    // Project card hover effects
     document.querySelectorAll('.project-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transform = 'translateY(-10px) scale(1.02)';
         });
-        
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
         });
     });
+}
+
+// Hide loading screen on window load, then init app and notify listeners
+window.addEventListener('load', () => {
+    const loadingScreen = document.querySelector('.loading-screen');
+    if (loadingScreen) {
+        // Allow a tiny delay for a smoother transition
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                // Dispatch a global event to signal app readiness
+                document.dispatchEvent(new CustomEvent('app:ready'));
+                initAppEnhancements();
+            }, 500);
+        }, 150);
+    } else {
+        // No loading screen present; initialize immediately
+        document.dispatchEvent(new CustomEvent('app:ready'));
+        initAppEnhancements();
+    }
 });
 
 // Performance optimization: Debounce scroll events

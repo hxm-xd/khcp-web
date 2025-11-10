@@ -9,8 +9,7 @@
     return;
   }
 
-  const ctx = canvas.getContext('2d');
-  let width = 0, height = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let ctx, width = 0, height = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
   let particles = [];
   const NUM_PARTICLES_BASE = 60; // scaled with area
   const COLORS = [
@@ -18,6 +17,13 @@
     'rgba(255,107,213,0.28)',
     'rgba(255,255,255,0.10)'
   ];
+
+  function boot(){
+    ctx = canvas.getContext('2d');
+    window.addEventListener('resize', debounce(resize, 150));
+    resize();
+    rafId = requestAnimationFrame(step);
+  }
 
   function resize(){
     const rect = canvas.getBoundingClientRect();
@@ -92,9 +98,6 @@
   }
 
   let rafId = null;
-  window.addEventListener('resize', debounce(resize, 150));
-  resize();
-  rafId = requestAnimationFrame(step);
 
   // Pause when tab hidden
   document.addEventListener('visibilitychange', () => {
@@ -108,5 +111,13 @@
 
   function debounce(fn, wait){
     let t; return function(){ clearTimeout(t); t = setTimeout(fn, wait); };
+  }
+
+  // Defer boot until app is ready (loading screen hidden)
+  const loading = document.querySelector('.loading-screen');
+  if (loading && !loading.classList.contains('hidden')) {
+    document.addEventListener('app:ready', boot, { once: true });
+  } else {
+    boot();
   }
 })();
