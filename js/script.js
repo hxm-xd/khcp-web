@@ -2,6 +2,54 @@
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
 
+// Prevent user scrolling while the loading screen is active. We'll add
+// the `loading-active` class immediately so the CSS rule above can take effect
+// before the load event removes it.
+try {
+    document.documentElement.classList.add('loading-active');
+} catch (e) {
+    // ignore in older browsers
+}
+
+// Hero images used by the background carousel. We'll attempt to preload
+// these so the visible background is ready before we remove the loader.
+const HERO_IMAGES = [
+    '../images/Kandy1.jpeg',
+    '../images/Kandy2.jpg',
+    '../images/Kandy3.jpg'
+];
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function preloadImages(urls, timeout = 1200) {
+    return new Promise((resolve) => {
+        if (!urls || !urls.length) return resolve();
+        let settled = 0;
+        const images = [];
+
+        const maybeResolve = () => {
+            settled++;
+            if (settled >= urls.length) {
+                clearTimeout(timer);
+                resolve();
+            }
+        };
+
+        urls.forEach(u => {
+            const img = new Image();
+            img.onload = maybeResolve;
+            img.onerror = maybeResolve; // treat errors as "finished" to avoid blocking
+            img.src = u;
+            images.push(img);
+        });
+
+        // Fallback: resolve after timeout even if some images didn't finish
+        const timer = setTimeout(() => resolve(), timeout);
+    });
+}
+
 hamburger.addEventListener('click', () => {
     hamburger.classList.toggle('active');
     navMenu.classList.toggle('active');
@@ -391,18 +439,57 @@ function initAppEnhancements() {
 window.addEventListener('load', () => {
     const loadingScreen = document.querySelector('.loading-screen');
     if (loadingScreen) {
-        // Allow a tiny delay for a smoother transition
-        setTimeout(() => {
+        // Keep the loader visible while we preload important background assets
+        // and wait at least a short minimum time. This gives the background
+        // visuals time to appear before we hide the loader.
+        const MIN_VISIBLE = 350; // ms minimum loader time
+        const IMAGES_FALLBACK = 1400; // ms max wait for image preload
+        const TRANSITION_FALLBACK = 1400; // ms max wait for transitionend
+
+        // Start preloading immediately and also enforce a minimum visible time.
+        const preloadPromise = preloadImages(HERO_IMAGES, IMAGES_FALLBACK);
+        const minDelayPromise = delay(MIN_VISIBLE);
+
+        Promise.all([preloadPromise, minDelayPromise]).then(() => {
+            // start fade
             loadingScreen.classList.add('hidden');
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
+
+            let finished = false;
+
+            const finishHide = () => {
+                if (finished) return;
+                finished = true;
+                try {
+                    loadingScreen.style.display = 'none';
+                    loadingScreen.setAttribute('aria-hidden', 'true');
+                    // restore scrolling
+                    try { document.documentElement.classList.remove('loading-active'); } catch(e) {}
+                } catch (e) {
+                    // ignore
+                }
+                // Allow heading and hero animations to run now that the background
+                // is visible.
+                try { document.documentElement.classList.add('animations-ready'); } catch(e) {}
                 // Dispatch a global event to signal app readiness
                 document.dispatchEvent(new CustomEvent('app:ready'));
                 initAppEnhancements();
-            }, 500);
-        }, 150);
+            };
+
+            const onTransitionEnd = (e) => {
+                // wait for opacity transition to finish
+                if (e.propertyName && e.propertyName.toLowerCase().includes('opacity')) {
+                    finishHide();
+                }
+            };
+
+            loadingScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
+
+            // Fallback: if transitionend doesn't fire (old browsers), force finish
+            setTimeout(finishHide, TRANSITION_FALLBACK);
+        });
     } else {
         // No loading screen present; initialize immediately
+        try { document.documentElement.classList.add('animations-ready'); } catch(e) {}
         document.dispatchEvent(new CustomEvent('app:ready'));
         initAppEnhancements();
     }
