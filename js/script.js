@@ -336,6 +336,30 @@ function enhanceMobileMenu() {
 
 // Initialize all enhancements
 document.addEventListener('DOMContentLoaded', () => {
+    // Hero background carousel
+    const heroBgCarousel = document.querySelector('.hero-bg-carousel');
+    if (heroBgCarousel) {
+        const images = [
+            '../images/Kandy1.jpeg',
+            '../images/Kandy2.jpg',
+            '../images/Kandy3.jpg'
+        ];
+        let current = 0;
+        // Create image elements
+        images.forEach((src, idx) => {
+            const img = document.createElement('img');
+            img.src = src;
+            img.className = 'carousel-image' + (idx === 0 ? ' active' : '');
+            heroBgCarousel.appendChild(img);
+        });
+        const imgEls = heroBgCarousel.querySelectorAll('.carousel-image');
+        setInterval(() => {
+            imgEls[current].classList.remove('active');
+            current = (current + 1) % images.length;
+            imgEls[current].classList.add('active');
+        }, 4000);
+    }
+
     // Hide loading screen after page loads
     setTimeout(() => {
         const loadingScreen = document.querySelector('.loading-screen');
