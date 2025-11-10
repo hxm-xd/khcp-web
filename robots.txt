@@ -1,0 +1,7 @@
+
+# robots.txt - allow all and point to sitemap
+User-agent: *
+Allow: /
+
+# Sitemap location (absolute URL)
+Sitemap: https://rackhcp.vercel.app/sitemap.xml
