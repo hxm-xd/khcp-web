@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Analytics — Admin</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="brand">KHCP Admin</div>
+      <nav>
+        <a href="dashboard.html">Overview</a>
+        <a href="blog.html">Blog</a>
+        <a href="avenues.html">Avenues</a>
+        <a href="directors.html">Directors</a>
+        <a href="projects.html">Projects</a>
+        <a href="analytics.html" class="active">Analytics</a>
+        <a href="profile.html">Profile</a>
+        <a href="#" id="logoutBtn">Logout</a>
+      </nav>
+    </header>
+
+    <main class="admin-main">
+      <section class="manage">
+        <h2>Analytics</h2>
+        <div class="charts">
+          <canvas id="countsChart" width="400" height="200"></canvas>
+          <canvas id="distributionChart" width="400" height="200"></canvas>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

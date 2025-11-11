@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin Login — KHCP</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body class="admin-page">
+    <main class="admin-center">
+      <div class="admin-card">
+        <h2>KHCP Admin Login</h2>
+        <form id="loginForm">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="admin@example.com"
+            required
+          />
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="password"
+            required
+          />
+          <button class="btn btn-primary" type="submit">Sign in</button>
+        </form>
+        <p class="muted">
+          Tip: this is a frontend-only demo admin. Any credentials will work.
+        </p>
+        <p><a href="../index.html">Return to site</a></p>
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Manage Avenues — Admin</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <header class="admin-header">
+      <div class="brand">KHCP Admin</div>
+      <nav>
+        <a href="dashboard.html">Overview</a>
+        <a href="blog.html">Blog</a>
+        <a href="avenues.html" class="active">Avenues</a>
+        <a href="directors.html">Directors</a>
+        <a href="projects.html">Projects</a>
+        <a href="analytics.html">Analytics</a>
+        <a href="profile.html">Profile</a>
+        <a href="#" id="logoutBtn">Logout</a>
+      </nav>
+    </header>
+
+    <main class="admin-main">
+      <section class="manage">
+        <h2>Avenues</h2>
+        <form id="avenueForm" class="form-inline">
+          <input id="avenueName" placeholder="Avenue Name" required />
+          <button class="btn btn-primary" type="submit">Add / Save</button>
+        </form>
+
+        <div id="avenuesList" class="list"></div>
+      </section>
+    </main>
+  </body>
+</html>

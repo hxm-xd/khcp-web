@@ -1,0 +1,26 @@
+/* Minimal admin styles, intentionally lightweight and separate from site styles */
+:root{--brand:#D22163;--muted:#6b7280}
+body{font-family:Inter,Segoe UI,Roboto,system-ui,Arial;margin:0;background:#f7f7fb;color:#111}
+.admin-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#fff;border-bottom:1px solid #e6e6ee;gap:12px}
+.admin-header .brand{font-weight:700;color:var(--brand)}
+.admin-header nav{display:flex;gap:10px;align-items:center}
+.admin-header a{color:#334155;text-decoration:none;padding:6px 10px;border-radius:6px}
+.admin-header a.active{background:linear-gradient(90deg,var(--brand),#ff6bd5);color:#fff}
+.admin-main{padding:24px}
+.admin-center{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.admin-card{background:#fff;padding:28px;border-radius:12px;box-shadow:0 10px 30px rgba(16,24,40,0.06);width:360px}
+.admin-card h2{margin-bottom:12px}
+.form-inline{display:flex;gap:8px;align-items:center}
+.form-inline input{padding:10px;border-radius:8px;border:1px solid #e6e6ee}
+.form-inline button{padding:10px 14px}
+.manage .list{margin-top:16px}
+.list .item{background:#fff;padding:12px;border-radius:8px;border:1px solid #eee;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.list .item .meta{color:var(--muted);font-size:0.95rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:18px}
+.card{background:#fff;padding:16px;border-radius:10px;text-align:center;border:1px solid #eee}
+.card h3{font-size:1.6rem;margin:0}
+.actions{display:flex;gap:10px}
+.btn{background:transparent;border:1px solid var(--brand);color:var(--brand);padding:8px 12px;border-radius:8px;text-decoration:none;cursor:pointer}
+.btn-primary{background:linear-gradient(90deg,var(--brand),#ff6bd5);color:#fff;border:none}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:800px){.charts{grid-template-columns:1fr}.admin-card{width:92vw}}
