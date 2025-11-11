@@ -36,4 +36,87 @@
       </div>
     </main>
   </body>
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Admin Login — KHCP</title>
+      <link rel="stylesheet" href="./styles.css" />
+      <link rel="stylesheet" href="../styles/styles.css" />
+      <script defer src="./app.js"></script>
+    </head>
+    <body class="admin-page">
+      <main class="admin-main">
+        <div class="login-grid">
+          <div class="login-hero" aria-hidden="true">
+            <img
+              src="../images/KHCP-Logo.png"
+              alt="KHCP logo"
+              class="login-logo"
+            />
+            <h1>KHCP Administration</h1>
+            <p class="lead">
+              Manage blog posts, avenues, directors and projects. This is a
+              lightweight demo admin — data is stored locally in your browser.
+            </p>
+            <p class="muted small">
+              Use the same credentials on any device to demo the UI. To reset
+              data open DevTools → Application → Local Storage and remove
+              admin_* keys.
+            </p>
+          </div>
+
+          <div class="login-panel">
+            <div class="admin-card">
+              <h2>Sign in</h2>
+              <form id="loginForm" class="login-form">
+                <label for="email" class="sr-only">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="you@domain.com"
+                  required
+                  autocomplete="email"
+                />
+
+                <label for="password" class="sr-only">Password</label>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  required
+                  autocomplete="current-password"
+                />
+
+                <div class="form-actions">
+                  <button class="btn btn-primary" type="submit">Sign in</button>
+                  <a href="../index.html" class="btn ghost">Back to site</a>
+                </div>
+              </form>
+              <p class="muted small" style="margin-top: 12px">
+                Tip: this is a frontend-only demo admin. Any credentials will
+                work.
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <style>
+        /* small helper to hide labels visually but keep for screen readers */
+        .sr-only {
+          position: absolute !important;
+          width: 1px !important;
+          height: 1px !important;
+          padding: 0 !important;
+          margin: -1px !important;
+          overflow: hidden !important;
+          clip: rect(0, 0, 0, 0) !important;
+          white-space: nowrap !important;
+          border: 0 !important;
+        }
+      </style>
+    </body>
+  </html>
 </html>
