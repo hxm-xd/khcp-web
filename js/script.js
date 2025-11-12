@@ -370,6 +370,8 @@ function enhanceMobileMenu() {
         if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
+            // also close any open dropdowns
+            document.querySelectorAll('.nav-menu .has-dropdown.open').forEach(d => d.classList.remove('open'));
         }
     });
     
@@ -378,7 +380,53 @@ function enhanceMobileMenu() {
         if (e.key === 'Escape') {
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
+            document.querySelectorAll('.nav-menu .has-dropdown.open').forEach(d => d.classList.remove('open'));
         }
+    });
+
+    // Dropdown toggle for Avenues on small screens and keyboard accessibility
+    document.querySelectorAll('.nav-menu .has-dropdown > a').forEach(trigger => {
+        // click toggles only on small screens (mobile) to avoid interfering with hover on desktop
+        trigger.addEventListener('click', function(e) {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+                const expanded = parent.classList.contains('open');
+                this.setAttribute('aria-expanded', expanded);
+            }
+        });
+
+        // allow Enter / Space to toggle the dropdown for keyboard users
+        trigger.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+                const expanded = parent.classList.contains('open');
+                this.setAttribute('aria-expanded', expanded);
+            }
+        });
+    });
+
+    // Add a short hover delay so users can move the pointer into the dropdown
+    // without it closing immediately. Use a WeakMap to store timers per element.
+    const hoverTimers = new WeakMap();
+    document.querySelectorAll('.nav-menu .has-dropdown').forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            const t = hoverTimers.get(item);
+            if (t) { clearTimeout(t); hoverTimers.delete(item); }
+            item.classList.add('open');
+            const a = item.querySelector('> a'); if (a) a.setAttribute('aria-expanded', 'true');
+        });
+        item.addEventListener('mouseleave', () => {
+            const timer = setTimeout(() => {
+                item.classList.remove('open');
+                const a = item.querySelector('> a'); if (a) a.setAttribute('aria-expanded', 'false');
+                hoverTimers.delete(item);
+            }, 240); // 240ms grace period
+            hoverTimers.set(item, timer);
+        });
     });
 }
 
