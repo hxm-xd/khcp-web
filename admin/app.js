@@ -6,7 +6,8 @@
   function setLS(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
 
   // Protect pages: if not logged in, redirect to login
-  function isLogged(){ return !!getLS('adminAuth'); }
+  function getAuth(){ try{ return JSON.parse(localStorage.getItem('adminAuth') || sessionStorage.getItem('adminAuth') || 'null'); }catch(e){ return null } }
+  function isLogged(){ return !!getAuth(); }
   function requireAuth(){ if(page !== 'index.html' && !isLogged()){ window.location.href = 'index.html'; } }
 
   // Seed sample data if missing
@@ -30,17 +31,40 @@
   }
 
   // Logout hookup
-  document.addEventListener('click', function(e){ if(e.target && e.target.id==='logoutBtn'){ localStorage.removeItem('adminAuth'); window.location.href='index.html'; } });
+  document.addEventListener('click', function(e){ if(e.target && e.target.id==='logoutBtn'){ localStorage.removeItem('adminAuth'); sessionStorage.removeItem('adminAuth'); window.location.href='index.html'; } });
 
   // Login page
   if(page === 'index.html' || page === ''){
     seed();
     const form = document.getElementById('loginForm');
+    const toggle = document.getElementById('togglePassword');
+    const passInput = document.getElementById('password');
+    const err = document.getElementById('loginError');
+
+    // Toggle password visibility
+    if(toggle && passInput){
+      toggle.addEventListener('click', function(){
+        if(passInput.type === 'password'){ passInput.type = 'text'; toggle.textContent = 'Hide'; }
+        else { passInput.type = 'password'; toggle.textContent = 'Show'; }
+      });
+    }
+
     form && form.addEventListener('submit', function(evt){
       evt.preventDefault();
       const email = document.getElementById('email').value || 'admin@example.com';
       const name = email.split('@')[0] || 'Admin';
-      setLS('adminAuth',{name:name,email:email});
+      const remember = document.getElementById('remember') && document.getElementById('remember').checked;
+
+      // simple client-side validation
+      if(!email || !passInput.value){ if(err){ err.style.display='block'; err.textContent='Please enter email and password.'; } return; }
+
+      // persist in localStorage if remember checked, otherwise sessionStorage
+      const auth = {name:name,email:email,ts:Date.now()};
+      try{
+        if(remember) setLS('adminAuth', auth);
+        else sessionStorage.setItem('adminAuth', JSON.stringify(auth));
+      }catch(e){ setLS('adminAuth', auth); }
+
       window.location.href = 'dashboard.html';
     });
     return;
@@ -160,6 +184,30 @@
   }
 
   // Utility: very small HTML escaper
-  function escapeHtml(s){ return String(s||'').replace(/[&<>\"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function escapeHtml(s){ return String(s||'').replace(/[&<>\\"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  // Admin mobile hamburger/menu behavior (applies across admin pages)
+  try{
+    const adminHamburger = document.getElementById('adminHamburger');
+    const adminHeader = document.querySelector('.admin-header');
+    const adminNavLinks = adminHeader ? adminHeader.querySelectorAll('nav a') : [];
+    if(adminHamburger){
+      adminHamburger.addEventListener('click', function(e){
+        const open = document.body.classList.toggle('admin-nav-open');
+        adminHamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        // animate hamburger into X
+        adminHamburger.classList.toggle('open', open);
+      });
+
+      // Close menu when clicking outside header
+      document.addEventListener('click', function(e){ if(!e.target.closest('.admin-header') && document.body.classList.contains('admin-nav-open')){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } });
+
+      // Close when pressing Escape
+      document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && document.body.classList.contains('admin-nav-open')){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } });
+
+      // Close when a nav link is clicked (mobile)
+      Array.from(adminNavLinks).forEach(a=> a.addEventListener('click', function(){ if(window.innerWidth <= 900){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } }));
+    }
+  }catch(e){ /* no-op if header missing */ }
 
 })();

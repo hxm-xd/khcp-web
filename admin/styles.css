@@ -25,6 +25,24 @@ body{
 .admin-header a:hover{ transform:translateY(-2px); }
 .admin-header a.active{ background: linear-gradient(90deg,var(--brand),var(--brand-2)); color:#fff; box-shadow: 0 8px 28px rgba(210,33,99,0.12); }
 
+/* Hamburger for mobile admin nav */
+.admin-hamburger{ display:none; width:44px; height:44px; border-radius:8px; background:transparent; border:1px solid #eef2f6; align-items:center; justify-content:center; cursor:pointer; padding:0; transition: background 180ms ease, transform 180ms ease }
+.admin-hamburger span{ display:block; width:18px; height:2px; background:#334155; position:relative; transition: background 180ms ease, transform 220ms ease }
+.admin-hamburger span::before, .admin-hamburger span::after{ content:''; position:absolute; left:0; width:18px; height:2px; background:#334155; transition: transform 220ms ease, top 220ms ease }
+.admin-hamburger span::before{ top:-6px }
+.admin-hamburger span::after{ top:6px }
+
+/* hamburger -> X animation when open */
+.admin-hamburger.open{ background: linear-gradient(90deg,var(--brand),var(--brand-2)); border-color: transparent; }
+.admin-hamburger.open span{ background: transparent }
+.admin-hamburger.open span::before{ transform: rotate(45deg); top: 0 }
+.admin-hamburger.open span::after{ transform: rotate(-45deg); top: 0 }
+
+/* When nav is toggled on mobile, show it as a stacked panel */
+body.admin-nav-open .admin-header nav{ display:flex; position:absolute; left:0; right:0; top:64px; background:var(--card); flex-direction:column; gap:0; padding:10px 12px; box-shadow:0 12px 40px rgba(16,24,40,0.08); z-index:1200; transform-origin:top center; opacity:0; transform:translateY(-6px); transition:opacity 220ms ease, transform 220ms ease }
+body.admin-nav-open .admin-header nav a{ display:block; padding:12px 14px; border-radius:8px; margin:6px 0; }
+body.admin-nav-open .admin-header nav{ opacity:1; transform:translateY(0) }
+
 /* Layout */
 .admin-main{ padding:28px; max-width:1200px; margin:0 auto; }
 .admin-center{ min-height:100vh; display:flex; align-items:center; justify-content:center; }
@@ -71,6 +89,7 @@ body{
 	.charts{ grid-template-columns: 1fr }
 	.admin-card{ width:92vw }
 	.admin-header nav{ display:none }
+	.admin-hamburger{ display:flex }
 }
 
 /* Login page specific */
@@ -82,11 +101,60 @@ body{
 .login-hero h1{ margin:0 0 12px; color:var(--brand); font-size:1.6rem }
 .login-hero .lead{ color:#334155; font-size:1rem; line-height:1.6 }
 .login-panel{ display:flex; justify-content:center }
-.login-form input{ width:100%; margin-bottom:12px; }
+.login-form input{ width:100%; margin-bottom:12px; align-items: center; justify-content: center; }
 .form-actions{ display:flex; gap:10px; align-items:center; margin-top:8px }
+
+/* Input group & password toggle */
+.input-group{ position:relative }
+.input-group input{ padding:12px 14px; border-radius:10px; border:1px solid #e6eef6; box-shadow: inset 0 1px 0 rgba(16,24,40,0.02); font-size:1rem }
+.input-with-icon .password-toggle{ position:absolute; right:8px; top:50%; transform:translateY(-50%); background:transparent; border:none; color:var(--brand); padding:6px 8px; border-radius:8px; cursor:pointer; font-weight:700 }
+.password-toggle:focus{ outline:2px solid rgba(210,33,99,0.12); }
+.form-row{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:6px }
+.checkbox{ display:inline-flex; align-items:center; gap:8px; color:var(--muted); font-weight:600; }
+.checkbox input{ width:16px; height:16px; }
+.login-form .muted.small{ margin:0 }
+
+/* Error message */
+#loginError{ color:tomato }
+
 
 @media(max-width:900px){
 	.login-grid{ grid-template-columns: 1fr; padding:20px; gap:18px }
 	.login-panel{ order:-1 }
 	.login-hero{ text-align:center }
+}
+
+/* Mobile / small tablet improvements for admin pages */
+@media (max-width: 700px) {
+	.admin-main { padding: 16px; }
+	.cards { grid-template-columns: 1fr !important; gap:12px; }
+	.card { padding: 14px; border-radius:12px; }
+	.charts { grid-template-columns: 1fr !important; }
+	.admin-card { width: 100%; padding: 18px; box-shadow: 0 12px 32px rgba(16,24,40,0.06); }
+	.login-grid { margin: 18px auto; padding: 12px; }
+
+	/* Make lists stack vertically and keep actions reachable */
+	.list .item { flex-direction: column; align-items: flex-start; gap: 8px; }
+	.list .item .actions { width: 100%; display:flex; gap:8px; justify-content:flex-end; }
+	.list .item .meta { margin-top:6px; }
+
+	/* Forms: inputs and actions full width */
+	.form-inline { flex-direction: column; align-items: stretch; }
+	.form-inline input[type="text"], .form-inline input[type="email"], .form-inline input[type="password"], .form-inline input[type="search"]{ min-width:unset; width:100%; }
+	.form-actions{ flex-direction: column-reverse; align-items: stretch; }
+	.form-actions .btn, .form-actions a.btn { width:100%; }
+
+	/* Tables / long content: allow horizontal scroll */
+	.table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+	/* Reduce typography slightly on narrow screens */
+	.admin-header .brand { font-size: 0.95rem; }
+	.card h3 { font-size: 1.25rem; }
+}
+
+@media (max-width: 420px) {
+	.login-logo { height: 72px; }
+	.login-hero h1 { font-size: 1.25rem; }
+	.admin-card { padding: 14px; }
+	.checkbox { font-size: 0.92rem }
 }

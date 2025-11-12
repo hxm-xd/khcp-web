@@ -55,9 +55,23 @@ hamburger.addEventListener('click', () => {
     navMenu.classList.toggle('active');
 });
 
-// Close mobile menu when clicking on a link
+// Close mobile menu when clicking on a link (but don't close when the click
+// is the Avenues dropdown trigger itself — that should toggle the submenu)
 document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+        // If this anchor is the direct trigger for a dropdown (its parent li
+        // has the .has-dropdown class) then we should NOT close the entire
+        // mobile nav here. The specialized dropdown handler will manage
+        // toggling the submenu. Submenu/regular links should still close the nav.
+        const parentLi = link.parentElement;
+        const isDropdownTrigger = parentLi && parentLi.classList && parentLi.classList.contains('has-dropdown');
+
+        if (isDropdownTrigger) {
+            // let the dropdown click handler manage this; don't close nav
+            return;
+        }
+
+        // For all other links (including submenu items), close the mobile nav
         hamburger.classList.remove('active');
         navMenu.classList.remove('active');
     });
