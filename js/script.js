@@ -58,20 +58,8 @@ hamburger.addEventListener('click', () => {
 // Close mobile menu when clicking on a link (but don't close when the click
 // is the Avenues dropdown trigger itself — that should toggle the submenu)
 document.querySelectorAll('.nav-menu a').forEach(link => {
-    link.addEventListener('click', (e) => {
-        // If this anchor is the direct trigger for a dropdown (its parent li
-        // has the .has-dropdown class) then we should NOT close the entire
-        // mobile nav here. The specialized dropdown handler will manage
-        // toggling the submenu. Submenu/regular links should still close the nav.
-        const parentLi = link.parentElement;
-        const isDropdownTrigger = parentLi && parentLi.classList && parentLi.classList.contains('has-dropdown');
-
-        if (isDropdownTrigger) {
-            // let the dropdown click handler manage this; don't close nav
-            return;
-        }
-
-        // For all other links (including submenu items), close the mobile nav
+    link.addEventListener('click', () => {
+        // Always close the mobile nav when a link is clicked
         hamburger.classList.remove('active');
         navMenu.classList.remove('active');
     });
@@ -398,27 +386,16 @@ function enhanceMobileMenu() {
         }
     });
 
-    // Dropdown toggle for Avenues on small screens and keyboard accessibility
+    // Keyboard accessibility for desktop only; no mobile dropdown behavior
     document.querySelectorAll('.nav-menu .has-dropdown > a').forEach(trigger => {
-        // click toggles only on small screens (mobile) to avoid interfering with hover on desktop
-        trigger.addEventListener('click', function(e) {
-            if (window.innerWidth <= 768) {
-                e.preventDefault();
-                const parent = this.parentElement;
-                parent.classList.toggle('open');
-                const expanded = parent.classList.contains('open');
-                this.setAttribute('aria-expanded', expanded);
-            }
-        });
-
-        // allow Enter / Space to toggle the dropdown for keyboard users
         trigger.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
+            if (window.innerWidth > 768 && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault();
+                e.stopPropagation();
                 const parent = this.parentElement;
-                parent.classList.toggle('open');
-                const expanded = parent.classList.contains('open');
-                this.setAttribute('aria-expanded', expanded);
+                const willOpen = !parent.classList.contains('open');
+                parent.classList.toggle('open', willOpen);
+                this.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
             }
         });
     });
@@ -431,12 +408,12 @@ function enhanceMobileMenu() {
             const t = hoverTimers.get(item);
             if (t) { clearTimeout(t); hoverTimers.delete(item); }
             item.classList.add('open');
-            const a = item.querySelector('> a'); if (a) a.setAttribute('aria-expanded', 'true');
+            const a = item.querySelector(':scope > a'); if (a) a.setAttribute('aria-expanded', 'true');
         });
         item.addEventListener('mouseleave', () => {
             const timer = setTimeout(() => {
                 item.classList.remove('open');
-                const a = item.querySelector('> a'); if (a) a.setAttribute('aria-expanded', 'false');
+                const a = item.querySelector(':scope > a'); if (a) a.setAttribute('aria-expanded', 'false');
                 hoverTimers.delete(item);
             }, 240); // 240ms grace period
             hoverTimers.set(item, timer);
