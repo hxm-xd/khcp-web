@@ -450,6 +450,7 @@ function initAppEnhancements() {
     createScrollToTopButton();
     setupAnimations();
     enhanceMobileMenu();
+    interceptInternalLinks();
 
     // Button tap feedback
     document.querySelectorAll('.btn').forEach(btn => {
@@ -470,6 +471,54 @@ function initAppEnhancements() {
         });
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+}
+
+// Intercept internal link clicks to show the rotary-gear loader and play a
+// short exit animation before navigating. This improves perceived speed and
+// provides a smooth transition between pages.
+function interceptInternalLinks() {
+    document.querySelectorAll('a[href]').forEach(a => {
+        const href = a.getAttribute('href');
+        if (!href) return;
+        // ignore same-page anchors, mailto/tel, and javascript:void
+        if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+
+        // try to resolve url and ensure it's same-origin
+        let url;
+        try { url = new URL(a.href, location.href); } catch (e) { return; }
+        if (url.origin !== location.origin) return; // external link, skip
+
+        // Skip links that open in new tab or have download attribute
+        if (a.target && a.target !== '_self') return;
+        if (a.hasAttribute('download')) return;
+
+        a.addEventListener('click', function(e) {
+            // allow user modifier-clicks to open in new tab
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+            e.preventDefault();
+
+            const loadingScreen = document.querySelector('.loading-screen');
+            if (loadingScreen) {
+                // Make it visible and mark as exiting so CSS keeps it shown
+                loadingScreen.classList.remove('hidden');
+                loadingScreen.classList.add('exiting');
+                loadingScreen.style.display = 'flex';
+                loadingScreen.setAttribute('aria-hidden', 'false');
+            }
+
+            // Add a page-exit class to trigger page fade/scale (CSS targets :root.page-exit ...)
+            try { document.documentElement.classList.add('page-exit'); } catch (e) {}
+
+            // Small delay to allow the animation to play, then navigate
+            const NAV_DELAY = 520; // ms (should be slightly longer than CSS fade)
+            setTimeout(() => {
+                // Remove the page-exit to avoid persisting state if navigation is prevented
+                try { document.documentElement.classList.remove('page-exit'); } catch (e) {}
+                window.location.href = url.href;
+            }, NAV_DELAY);
         });
     });
 }
