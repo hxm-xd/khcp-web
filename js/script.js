@@ -570,17 +570,8 @@ window.addEventListener('load', () => {
                 initAppEnhancements();
             };
 
-            const onTransitionEnd = (e) => {
-                // wait for opacity transition to finish
-                if (e.propertyName && e.propertyName.toLowerCase().includes('opacity')) {
-                    finishHide();
-                }
-            };
-
-            loadingScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
-
-            // Fallback: if transitionend doesn't fire (old browsers), force finish
-            setTimeout(finishHide, TRANSITION_FALLBACK);
+            // Wait for the CSS transition (1s) to complete
+            setTimeout(finishHide, 1000);
         });
     } else {
         // No loading screen present; initialize immediately
