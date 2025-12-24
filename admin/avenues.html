@@ -3,108 +3,133 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Manage Avenues — Admin</title>
+    <title>Manage Avenues  Admin</title>
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script type="module" src="./app.js"></script>
   </head>
   <body>
-    <header class="admin-header">
-      <div class="brand">KHCP Admin</div>
-      <button
-        id="adminHamburger"
-        class="admin-hamburger"
-        aria-label="Toggle menu"
-      >
-        <span></span>
-      </button>
-      <nav>
-        <a href="dashboard.html">Overview</a>
-        <a href="blog.html">Blog</a>
-        <a href="avenues.html" class="active">Avenues</a>
-        <a href="directors.html">Directors</a>
-        <a href="projects.html">Projects</a>
-        <a href="analytics.html">Analytics</a>
-        <a href="profile.html">Profile</a>
-        <a href="#" id="logoutBtn">Logout</a>
-      </nav>
-    </header>
-
-    <main class="admin-main">
-      <section class="manage">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-          "
-        >
-          <h2>Manage Avenues</h2>
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="dashboard.html" class="brand">
+            <i class="fas fa-shield-alt"></i> KHCP Admin
+          </a>
         </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i> Overview
+          </a>
+          <a href="blog.html" class="nav-link">
+            <i class="fas fa-pen-nib"></i> Blog
+          </a>
+          <a href="avenues.html" class="nav-link active">
+            <i class="fas fa-users"></i> Avenues
+          </a>
+          <a href="directors.html" class="nav-link">
+            <i class="fas fa-user-tie"></i> Directors
+          </a>
+          <a href="projects.html" class="nav-link">
+            <i class="fas fa-project-diagram"></i> Projects
+          </a>
+          <a href="analytics.html" class="nav-link">
+            <i class="fas fa-chart-line"></i> Analytics
+          </a>
+          <a href="profile.html" class="nav-link">
+            <i class="fas fa-cog"></i> Profile
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <a href="#" id="logoutBtn" class="nav-link" style="color: #ef4444;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </aside>
 
-        <p class="text-muted" style="margin-bottom: 20px">
-          Select an avenue below to edit its details. New avenues cannot be
-          added.
-        </p>
-
-        <form id="avenueForm" class="form-stack" style="display: none">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="avenueName">Avenue Name</label>
-              <input
-                id="avenueName"
-                placeholder="e.g. Community Service"
-                required
-                readonly
-                style="background-color: #f1f5f9; cursor: not-allowed"
-              />
-            </div>
-            <div class="form-group">
-              <label for="avenueImage">Cover Image URL</label>
-              <input id="avenueImage" placeholder="https://..." />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="avenueDescription">Description</label>
-            <textarea
-              id="avenueDescription"
-              placeholder="Brief description of this avenue..."
-            ></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="stat1Label">Stat 1 Label</label>
-              <input id="stat1Label" placeholder="e.g. Outreach Campaigns" />
-            </div>
-            <div class="form-group">
-              <label for="stat1Value">Stat 1 Value</label>
-              <input id="stat1Value" placeholder="e.g. 10+" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="stat2Label">Stat 2 Label</label>
-              <input id="stat2Label" placeholder="e.g. Volunteer Teams" />
-            </div>
-            <div class="form-group">
-              <label for="stat2Value">Stat 2 Value</label>
-              <input id="stat2Value" placeholder="e.g. 5" />
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button class="btn btn-primary" type="submit">Update Avenue</button>
-            <button class="btn ghost" type="button" id="cancelEdit">
-              Cancel
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="top-bar">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="mobile-toggle" id="sidebarToggle">
+              <i class="fas fa-bars"></i>
             </button>
+            <h1 class="page-title">Manage Avenues</h1>
           </div>
-        </form>
+        </header>
 
-        <div id="avenuesList" class="list"></div>
-      </section>
-    </main>
+        <div class="content-wrapper">
+          <p class="text-muted" style="margin-bottom: 20px">
+            Select an avenue below to edit its details. New avenues cannot be added.
+          </p>
+
+          <form id="avenueForm" class="section-card form-stack" style="display: none">
+            <div class="section-header">
+              <h3 class="section-title">Edit Avenue</h3>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="avenueName">Avenue Name</label>
+                <input
+                  id="avenueName"
+                  placeholder="e.g. Community Service"
+                  required
+                  readonly
+                  style="background-color: #f1f5f9; cursor: not-allowed"
+                />
+              </div>
+              <div class="form-group">
+                <label for="avenueImage">Cover Image URL</label>
+                <input id="avenueImage" placeholder="https://..." />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="avenueDescription">Description</label>
+              <textarea
+                id="avenueDescription"
+                placeholder="Brief description of this avenue..."
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="stat1Label">Stat 1 Label</label>
+                <input id="stat1Label" placeholder="e.g. Outreach Campaigns" />
+              </div>
+              <div class="form-group">
+                <label for="stat1Value">Stat 1 Value</label>
+                <input id="stat1Value" placeholder="e.g. 10+" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="stat2Label">Stat 2 Label</label>
+                <input id="stat2Label" placeholder="e.g. Volunteer Teams" />
+              </div>
+              <div class="form-group">
+                <label for="stat2Value">Stat 2 Value</label>
+                <input id="stat2Value" placeholder="e.g. 5" />
+              </div>
+            </div>
+
+            <div class="form-actions" style="margin-top: 1rem;">
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-save"></i> Update Avenue
+              </button>
+              <button class="btn btn-ghost" type="button" id="cancelEdit">
+                Cancel
+              </button>
+            </div>
+          </form>
+
+          <div id="avenuesList" class="list-container">
+            <!-- Avenues loaded here -->
+          </div>
+        </div>
+      </main>
+    </div>
   </body>
 </html>

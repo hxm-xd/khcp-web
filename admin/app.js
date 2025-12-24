@@ -93,32 +93,33 @@ async function seedAvenues() {
 function renderList(container, items, renderContentFn, allowDelete = true) {
   container.innerHTML = '';
   if (!items || items.length === 0) {
-    container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No items found.</p>';
+    container.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;">No items found.</p>';
     return;
   }
   items.forEach((item, index) => {
     const el = document.createElement('div');
-    el.className = 'item';
-    el.style.animationDelay = `${index * 0.05}s`; // Staggered animation
+    el.className = 'list-item';
+    el.style.animationDelay = `${index * 0.05}s`; 
     
-    // Common structure: Image (optional) + Content + Actions
     let imageHtml = '';
     if (item.imageUrl) {
-      imageHtml = `<img src="${escapeHtml(item.imageUrl)}" alt="Image" onerror="this.style.display='none'">`;
-    } else if (item.image) { // handle inconsistent naming if any
-      imageHtml = `<img src="${escapeHtml(item.image)}" alt="Image" onerror="this.style.display='none'">`;
+      imageHtml = `<img src="${escapeHtml(item.imageUrl)}" alt="Image" class="item-image" onerror="this.style.display='none'">`;
+    } else if (item.image) { 
+      imageHtml = `<img src="${escapeHtml(item.image)}" alt="Image" class="item-image" onerror="this.style.display='none'">`;
     }
 
     el.innerHTML = `
-      <div class="item-flex" style="width:100%">
+      <div class="item-content">
         ${imageHtml}
-        <div class="content">
+        <div class="item-details">
           ${renderContentFn(item)}
         </div>
-        <div class="actions">
-          <button class="btn ghost" data-action="edit" data-id="${item.id}">Edit</button>
-          ${allowDelete ? `<button class="btn danger" data-action="delete" data-id="${item.id}">Delete</button>` : ''}
-        </div>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-ghost" data-action="edit" data-id="${item.id}">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        ${allowDelete ? `<button class="btn btn-danger" data-action="delete" data-id="${item.id}"><i class="fas fa-trash"></i> Delete</button>` : ''}
       </div>
     `;
     container.appendChild(el);
@@ -823,21 +824,24 @@ if (page === 'analytics.html') {
   loadAnalytics();
 }
 
-// --- Mobile Menu ---
+// --- Sidebar Toggle ---
 
-try{
-  const adminHamburger = document.getElementById('adminHamburger');
-  const adminHeader = document.querySelector('.admin-header');
-  const adminNavLinks = adminHeader ? adminHeader.querySelectorAll('nav a') : [];
-  if(adminHamburger){
-    adminHamburger.addEventListener('click', function(e){
-      const open = document.body.classList.toggle('admin-nav-open');
-      adminHamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      adminHamburger.classList.toggle('open', open);
+try {
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebar = document.getElementById('sidebar');
+  
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
     });
 
-    document.addEventListener('click', function(e){ if(!e.target.closest('.admin-header') && document.body.classList.contains('admin-nav-open')){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } });
-    document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && document.body.classList.contains('admin-nav-open')){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } });
-    Array.from(adminNavLinks).forEach(a=> a.addEventListener('click', function(){ if(window.innerWidth <= 900){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } }));
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 1024) {
+        if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && sidebar.classList.contains('open')) {
+          sidebar.classList.remove('open');
+        }
+      }
+    });
   }
-}catch(e){ }
+} catch (e) { console.error("Sidebar toggle error", e); }

@@ -3,92 +3,118 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Manage Blog — Admin</title>
+    <title>Manage Blog  KHCP Admin</title>
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script type="module" src="./app.js"></script>
   </head>
   <body>
-    <header class="admin-header">
-      <div class="brand">KHCP Admin</div>
-      <button
-        id="adminHamburger"
-        class="admin-hamburger"
-        aria-label="Toggle menu"
-      >
-        <span></span>
-      </button>
-      <nav>
-        <a href="dashboard.html">Overview</a>
-        <a href="blog.html" class="active">Blog</a>
-        <a href="avenues.html">Avenues</a>
-        <a href="directors.html">Directors</a>
-        <a href="projects.html">Projects</a>
-        <a href="analytics.html">Analytics</a>
-        <a href="profile.html">Profile</a>
-        <a href="#" id="logoutBtn">Logout</a>
-      </nav>
-    </header>
-
-    <main class="admin-main">
-      <section class="manage">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-          "
-        >
-          <h2>Manage Blog Posts</h2>
+    <div class="admin-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="dashboard.html" class="brand">
+            <i class="fas fa-shield-alt"></i> KHCP Admin
+          </a>
         </div>
+        <nav class="sidebar-nav">
+          <a href="dashboard.html" class="nav-link">
+            <i class="fas fa-home"></i> Overview
+          </a>
+          <a href="blog.html" class="nav-link active">
+            <i class="fas fa-pen-nib"></i> Blog
+          </a>
+          <a href="avenues.html" class="nav-link">
+            <i class="fas fa-users"></i> Avenues
+          </a>
+          <a href="directors.html" class="nav-link">
+            <i class="fas fa-user-tie"></i> Directors
+          </a>
+          <a href="projects.html" class="nav-link">
+            <i class="fas fa-project-diagram"></i> Projects
+          </a>
+          <a href="analytics.html" class="nav-link">
+            <i class="fas fa-chart-line"></i> Analytics
+          </a>
+          <a href="profile.html" class="nav-link">
+            <i class="fas fa-cog"></i> Profile
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <a href="#" id="logoutBtn" class="nav-link" style="color: #ef4444;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </a>
+        </div>
+      </aside>
 
-        <form id="postForm" class="form-stack">
-          <div class="form-group">
-            <label for="postTitle">Post Title</label>
-            <input
-              id="postTitle"
-              placeholder="e.g. Annual Gala Success"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="postExcerpt">Short Excerpt</label>
-            <input
-              id="postExcerpt"
-              placeholder="Brief summary for the card view..."
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="postImage">Cover Image URL</label>
-            <input id="postImage" placeholder="https://..." />
-          </div>
-
-          <div class="form-group">
-            <label for="postContent">Full Content</label>
-            <textarea
-              id="postContent"
-              placeholder="Write your post content here..."
-              style="min-height: 200px"
-            ></textarea>
-          </div>
-
-          <div class="form-actions">
-            <button class="btn btn-primary" type="submit">Add Post</button>
-            <button
-              class="btn ghost"
-              type="button"
-              id="cancelEdit"
-              style="display: none"
-            >
-              Cancel
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="top-bar">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <button class="mobile-toggle" id="sidebarToggle">
+              <i class="fas fa-bars"></i>
             </button>
+            <h1 class="page-title">Manage Blog</h1>
           </div>
-        </form>
+        </header>
 
-        <div id="postsList" class="list"></div>
-      </section>
-    </main>
+        <div class="content-wrapper">
+          <form id="postForm" class="section-card form-stack">
+            <div class="section-header">
+              <h3 class="section-title">Add / Edit Post</h3>
+            </div>
+            
+            <div class="form-group">
+              <label for="postTitle">Post Title</label>
+              <input
+                id="postTitle"
+                placeholder="e.g. Annual Gala Success"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="postExcerpt">Short Excerpt</label>
+              <input
+                id="postExcerpt"
+                placeholder="Brief summary for the card view..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="postImage">Cover Image URL</label>
+              <input id="postImage" placeholder="https://..." />
+            </div>
+
+            <div class="form-group">
+              <label for="postContent">Full Content</label>
+              <textarea
+                id="postContent"
+                placeholder="Write your post content here..."
+                style="min-height: 200px"
+              ></textarea>
+            </div>
+
+            <div class="form-actions" style="margin-top: 1rem;">
+              <button class="btn btn-primary" type="submit">
+                <i class="fas fa-plus"></i> Add Post
+              </button>
+              <button
+                class="btn btn-ghost"
+                type="button"
+                id="cancelEdit"
+                style="display: none"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+
+          <div id="postsList" class="list-container">
+            <!-- Posts loaded here -->
+          </div>
+        </div>
+      </main>
+    </div>
   </body>
 </html>
