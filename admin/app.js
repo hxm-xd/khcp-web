@@ -64,7 +64,33 @@ function escapeHtml(text) {
     .replace(/'/g, "&#039;");
 }
 
-function renderList(container, items, renderContentFn) {
+async function seedAvenues() {
+  try {
+    const snap = await getDocs(collection(db, 'avenues'));
+    const existingNames = snap.docs.map(d => d.data().name);
+    
+    const defaults = [
+      { name: 'Community Service', link: 'avenues/community-service.html' },
+      { name: 'Club Service', link: 'avenues/club-service.html' },
+      { name: 'Professional Development', link: 'avenues/professional-development.html' },
+      { name: 'International Service', link: 'avenues/international-service.html' }
+    ];
+
+    let added = false;
+    for (const a of defaults) {
+      if (!existingNames.includes(a.name)) {
+        await addDoc(collection(db, 'avenues'), a);
+        added = true;
+      }
+    }
+    return added;
+  } catch (e) {
+    console.error("Error seeding avenues", e);
+    return false;
+  }
+}
+
+function renderList(container, items, renderContentFn, allowDelete = true) {
   container.innerHTML = '';
   if (!items || items.length === 0) {
     container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No items found.</p>';
@@ -91,7 +117,7 @@ function renderList(container, items, renderContentFn) {
         </div>
         <div class="actions">
           <button class="btn ghost" data-action="edit" data-id="${item.id}">Edit</button>
-          <button class="btn danger" data-action="delete" data-id="${item.id}">Delete</button>
+          ${allowDelete ? `<button class="btn danger" data-action="delete" data-id="${item.id}">Delete</button>` : ''}
         </div>
       </div>
     `;
@@ -104,6 +130,9 @@ async function populateAvenueSelect(selectId) {
   if (!select) return;
   
   try {
+    // Ensure avenues exist
+    await seedAvenues();
+
     const snap = await getDocs(collection(db, 'avenues'));
     const avenues = snap.docs.map(d => d.data().name).sort();
     
@@ -202,29 +231,66 @@ if (page === 'dashboard.html') {
     }
   }
 
-  async function seedAvenues() {
+  loadCounts();
+  seedAvenues().then(added => {
+    if (added) {
+      console.log('Seeded missing avenues');
+      loadCounts();
+    }
+  });
+
+  // --- Stats Logic ---
+  const statsForm = document.getElementById('statsForm');
+  const statMembers = document.getElementById('statMembers');
+  const statProjects = document.getElementById('statProjects');
+  const statYears = document.getElementById('statYears');
+  const statHours = document.getElementById('statHours');
+
+  async function loadStats() {
     try {
-      const snap = await getDocs(collection(db, 'avenues'));
-      if (snap.empty) {
-        const defaults = [
-          { name: 'Community Service', link: 'avenues/community-service.html' },
-          { name: 'Club Service', link: 'avenues/club-service.html' },
-          { name: 'Professional Development', link: 'avenues/professional-development.html' },
-          { name: 'International Service', link: 'avenues/international-service.html' }
-        ];
-        for (const a of defaults) {
-          await addDoc(collection(db, 'avenues'), a);
-        }
-        console.log('Seeded avenues');
-        loadCounts();
+      const snap = await getDocs(collection(db, 'settings'));
+      const statsDoc = snap.docs.find(d => d.data().type === 'homeStats');
+      
+      if (statsDoc) {
+        const data = statsDoc.data();
+        if (statMembers) statMembers.value = data.members || '';
+        if (statProjects) statProjects.value = data.projects || '';
+        if (statYears) statYears.value = data.years || '';
+        if (statHours) statHours.value = data.hours || '';
+        statsForm.dataset.id = statsDoc.id; // Store ID for update
       }
     } catch (e) {
-      console.error("Error seeding avenues", e);
+      console.error("Error loading stats", e);
     }
   }
 
-  loadCounts();
-  seedAvenues();
+  if (statsForm) {
+    statsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        type: 'homeStats',
+        members: statMembers.value,
+        projects: statProjects.value,
+        years: statYears.value,
+        hours: statHours.value
+      };
+
+      try {
+        const id = statsForm.dataset.id;
+        if (id) {
+          await updateDoc(doc(db, 'settings', id), data);
+        } else {
+          const ref = await addDoc(collection(db, 'settings'), data);
+          statsForm.dataset.id = ref.id;
+        }
+        showToast("Statistics updated successfully");
+      } catch (err) {
+        console.error("Error saving stats", err);
+        showToast("Error saving stats", "error");
+      }
+    });
+    loadStats();
+  }
 }
 
 // --- Blog Logic ---
@@ -433,6 +499,11 @@ if (page === 'avenues.html') {
 
   let editId = null;
 
+  const stat1Label = document.getElementById('stat1Label');
+  const stat1Value = document.getElementById('stat1Value');
+  const stat2Label = document.getElementById('stat2Label');
+  const stat2Value = document.getElementById('stat2Value');
+
   async function loadAvenues() {
     try {
       const snap = await getDocs(collection(db, 'avenues'));
@@ -441,7 +512,7 @@ if (page === 'avenues.html') {
       renderList(list, avenues, (a) => `
         <h4>${escapeHtml(a.name)}</h4>
         <div class="meta">${escapeHtml(a.description || '')}</div>
-      `);
+      `, false); 
     } catch (e) {
       console.error("Error loading avenues", e);
       showToast("Error loading avenues", "error");
@@ -449,25 +520,31 @@ if (page === 'avenues.html') {
   }
 
   if (form) {
-    setupCancelButton(form, submitBtn, 'Add Avenue', () => { editId = null; });
+    setupCancelButton(form, submitBtn, 'Update Avenue', () => { 
+      editId = null; 
+      form.style.display = 'none';
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (!editId) return; // Only allow updates
+
       const data = { 
-        name: nameInput.value,
+        // name: nameInput.value, // Name is read-only/fixed
         imageUrl: imageInput ? imageInput.value : '',
-        description: descInput ? descInput.value : ''
+        description: descInput ? descInput.value : '',
+        stat1Label: stat1Label ? stat1Label.value : '',
+        stat1Value: stat1Value ? stat1Value.value : '',
+        stat2Label: stat2Label ? stat2Label.value : '',
+        stat2Value: stat2Value ? stat2Value.value : ''
       };
 
       try {
-        if (editId) {
-          await updateDoc(doc(db, 'avenues', editId), data);
-          showToast("Avenue updated");
-        } else {
-          await addDoc(collection(db, 'avenues'), data);
-          showToast("Avenue added");
-        }
-        editId = resetForm(form, submitBtn, 'Add Avenue');
+        await updateDoc(doc(db, 'avenues', editId), data);
+        showToast("Avenue updated");
+        
+        editId = resetForm(form, submitBtn, 'Update Avenue');
+        form.style.display = 'none';
         loadAvenues();
       } catch (err) {
         console.error("Error saving avenue", err);
@@ -483,27 +560,34 @@ if (page === 'avenues.html') {
       const id = btn.dataset.id;
       const action = btn.dataset.action;
 
-      if (action === 'delete') {
-        if (confirm('Delete this avenue?')) {
-          await deleteDoc(doc(db, 'avenues', id));
-          showToast("Avenue deleted");
-          loadAvenues();
-        }
-      } else if (action === 'edit') {
+      if (action === 'edit') {
         const snap = await getDocs(collection(db, 'avenues'));
         const avenue = snap.docs.find(d => d.id === id).data();
         nameInput.value = avenue.name;
         if(imageInput) imageInput.value = avenue.imageUrl || '';
         if(descInput) descInput.value = avenue.description || '';
+        if(stat1Label) stat1Label.value = avenue.stat1Label || '';
+        if(stat1Value) stat1Value.value = avenue.stat1Value || '';
+        if(stat2Label) stat2Label.value = avenue.stat2Label || '';
+        if(stat2Value) stat2Value.value = avenue.stat2Value || '';
         
         editId = id;
         submitBtn.textContent = 'Update Avenue';
+        form.style.display = 'block'; // Show form
         form.querySelector('#cancelEdit').style.display = 'inline-block';
         form.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
-  if(list) loadAvenues();
+  if(list) {
+    loadAvenues();
+    seedAvenues().then(added => {
+      if (added) {
+        console.log('Seeded missing avenues on avenues page');
+        loadAvenues();
+      }
+    });
+  }
 }
 
 // --- Directors Logic ---
@@ -513,6 +597,7 @@ if (page === 'directors.html') {
   const form = document.getElementById('directorForm');
   const nameInput = document.getElementById('directorName');
   const avenueInput = document.getElementById('directorAvenue');
+  const yearInput = document.getElementById('directorYear');
   const imageInput = document.getElementById('directorImage');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
@@ -525,9 +610,14 @@ if (page === 'directors.html') {
       const snap = await getDocs(collection(db, 'directors'));
       const directors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
+      // Sort by year desc, then name
+      directors.sort((a, b) => (b.year || 0) - (a.year || 0));
+
       renderList(list, directors, (d) => `
         <h4>${escapeHtml(d.name)}</h4>
-        <div class="meta">${escapeHtml(d.avenue || '')}</div>
+        <div class="meta">
+          ${escapeHtml(d.avenue || '')} • ${escapeHtml(d.year || 'No Year')}
+        </div>
       `);
     } catch (e) {
       console.error("Error loading directors", e);
@@ -541,9 +631,10 @@ if (page === 'directors.html') {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
-        name: nameInput.value,
-        avenue: avenueInput.value,
-        imageUrl: imageInput ? imageInput.value : ''
+        name: nameInput.value.trim(),
+        avenue: avenueInput.value.trim(),
+        year: yearInput ? yearInput.value : '',
+        imageUrl: imageInput ? imageInput.value.trim() : ''
       };
 
       try {
@@ -581,6 +672,7 @@ if (page === 'directors.html') {
         const director = snap.docs.find(d => d.id === id).data();
         nameInput.value = director.name;
         avenueInput.value = director.avenue;
+        if(yearInput) yearInput.value = director.year || '';
         if(imageInput) imageInput.value = director.imageUrl || '';
         editId = id;
         submitBtn.textContent = 'Update Director';

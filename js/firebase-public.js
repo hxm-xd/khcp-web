@@ -247,11 +247,99 @@ if (page === 'projects.html') {
 }
 
 // 4. Avenue Pages (Directors)
-if (path.includes('/avenues/')) {
+if (path.includes('/avenues/') || page.includes('service') || page.includes('development')) {
   async function loadDirectors() {
-    const container = document.querySelector('.director-grid');
-    if (!container) return;
+    // Wait for DOM if needed
+    if (document.readyState === 'loading') {
+      await new Promise(r => window.addEventListener('DOMContentLoaded', r));
+    }
 
+    const container = document.querySelector('.director-grid');
+    if (!container) {
+      console.log("Director grid container not found");
+      return;
+    }
+
+    // Determine avenue from filename
+    let avenueName = '';
+    if (page.includes('community-service')) avenueName = 'Community Service';
+    else if (page.includes('club-service')) avenueName = 'Club Service';
+    else if (page.includes('professional-development')) avenueName = 'Professional Development';
+    else if (page.includes('international-service')) avenueName = 'International Service';
+
+    console.log("Loading directors for:", avenueName);
+
+    if (!avenueName) return;
+
+    try {
+      const q = query(collection(db, 'directors')); 
+      const snap = await getDocs(q);
+      
+      // Filter with normalization to handle potential whitespace or case issues
+      const directors = snap.docs
+        .map(d => d.data())
+        .filter(d => {
+          if (!d.avenue) return false;
+          return d.avenue.trim().toLowerCase() === avenueName.toLowerCase();
+        });
+
+      console.log("Found directors:", directors.length);
+
+      if (directors.length === 0) {
+        container.innerHTML = '<p>No directors listed yet.</p>';
+        return;
+      }
+
+      // Group by year
+      const groups = {};
+      const years = [];
+
+      directors.forEach(d => {
+        const y = d.year || 'Current';
+        if (!groups[y]) {
+          groups[y] = [];
+          years.push(y);
+        }
+        groups[y].push(d);
+      });
+
+      // Sort years desc
+      years.sort((a, b) => {
+        if (a === 'Current') return -1;
+        if (b === 'Current') return 1;
+        return b - a;
+      });
+
+      container.innerHTML = '';
+      
+      years.forEach(year => {
+        const list = groups[year];
+        const html = `
+          <div class="director-year" data-aos="fade-up">
+            <h4 class="year">${escapeHtml(year)}</h4>
+            <ul class="director-list">
+              ${list.map(d => `
+                <li class="director">
+                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; margin-right:10px;">` : ''}
+                  <div>
+                    <div class="director-name">${escapeHtml(d.name)}</div>
+                    <div class="director-role">${escapeHtml(d.avenue)} Director</div>
+                  </div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+      });
+
+    } catch (e) {
+      console.error("Error loading directors", e);
+    }
+  }
+  loadDirectors();
+
+  async function loadAvenueDetails() {
     // Determine avenue from filename
     let avenueName = '';
     if (page.includes('community-service')) avenueName = 'Community Service';
@@ -262,51 +350,34 @@ if (path.includes('/avenues/')) {
     if (!avenueName) return;
 
     try {
-      // We need to filter directors by avenue. 
-      // Since we didn't set up complex queries in admin, we'll fetch all and filter client side or use simple where
-      // Note: Firestore requires an index for some compound queries, but simple equality is fine.
-      // However, the admin saved 'avenue' as a string.
-      
-      const q = query(collection(db, 'directors')); // Fetch all for now to be safe with exact string matching
+      const q = query(collection(db, 'avenues'), where('name', '==', avenueName));
       const snap = await getDocs(q);
       
-      const directors = snap.docs
-        .map(d => d.data())
-        .filter(d => d.avenue === avenueName);
+      if (!snap.empty) {
+        const data = snap.docs[0].data();
+        
+        // Update Description
+        const descEl = document.getElementById('avenueDescription');
+        if (descEl && data.description) {
+          descEl.textContent = data.description;
+        }
 
-      if (directors.length === 0) {
-        container.innerHTML = '<p>No directors listed yet.</p>';
-        return;
+        // Update Stats
+        const s1Label = document.getElementById('stat1Label');
+        const s1Value = document.getElementById('stat1Value');
+        const s2Label = document.getElementById('stat2Label');
+        const s2Value = document.getElementById('stat2Value');
+
+        if (s1Label && data.stat1Label) s1Label.textContent = data.stat1Label;
+        if (s1Value && data.stat1Value) s1Value.textContent = data.stat1Value;
+        if (s2Label && data.stat2Label) s2Label.textContent = data.stat2Label;
+        if (s2Value && data.stat2Value) s2Value.textContent = data.stat2Value;
       }
-
-      container.innerHTML = '';
-      
-      // Group by year if we had a year field, but we don't. 
-      // So we'll just list them.
-      
-      const html = `
-        <div class="director-year" data-aos="fade-up">
-          <h4 class="year">Current Directors</h4>
-          <ul class="director-list">
-            ${directors.map(d => `
-              <li class="director">
-                ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; margin-right:10px;">` : ''}
-                <div>
-                  <div class="director-name">${escapeHtml(d.name)}</div>
-                  <div class="director-role">${escapeHtml(d.avenue)} Director</div>
-                </div>
-              </li>
-            `).join('')}
-          </ul>
-        </div>
-      `;
-      container.innerHTML = html;
-
     } catch (e) {
-      console.error("Error loading directors", e);
+      console.error("Error loading avenue details", e);
     }
   }
-  loadDirectors();
+  loadAvenueDetails();
 }
 
 // 5. Dynamic Navbar Avenues
@@ -316,24 +387,40 @@ async function loadNavbarAvenues() {
 
   try {
     const snap = await getDocs(collection(db, 'avenues'));
-    if (snap.empty) return; // Keep default if empty or error
-
-    const avenues = snap.docs.map(d => d.data());
+    let avenues = [];
     
+    if (!snap.empty) {
+      avenues = snap.docs.map(d => d.data());
+    }
+
+    // Ensure default avenues are present if DB is empty or missing them
+    const defaults = [
+      { name: 'Community Service', link: 'avenues/community-service.html' },
+      { name: 'Club Service', link: 'avenues/club-service.html' },
+      { name: 'Professional Development', link: 'avenues/professional-development.html' },
+      { name: 'International Service', link: 'avenues/international-service.html' }
+    ];
+
+    defaults.forEach(def => {
+      if (!avenues.find(a => a.name === def.name)) {
+        avenues.push(def);
+      }
+    });
+    
+    // Sort avenues to ensure consistent order
+    // Order: Club, Community, International, Professional
+    const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
+    avenues.sort((a, b) => {
+      return order.indexOf(a.name) - order.indexOf(b.name);
+    });
+
     // Determine prefix based on current location
     let prefix = '';
     if (path.endsWith('index.html') || path === '/') {
-      prefix = 'pages/'; // from root to pages/avenues/...
+      prefix = 'pages/'; 
     } else if (path.includes('/avenues/')) {
-      prefix = '../'; // from pages/avenues/ to pages/ (then + link which is avenues/...) -> wait.
-      // The link in DB is "avenues/community-service.html"
-      // If I am in "pages/avenues/", I want "community-service.html".
-      // So "avenues/community-service.html" needs to become "community-service.html"
-      // OR I can just go up to pages: "../" -> "pages/". Then append "avenues/..." -> "../avenues/community-service.html".
-      // Yes, "../avenues/community-service.html" works from "pages/avenues/".
-      prefix = '../';
+      prefix = '../'; 
     } else if (path.includes('/pages/')) {
-      // e.g. pages/about.html. Link "avenues/..." works directly.
       prefix = '';
     }
 
@@ -341,10 +428,16 @@ async function loadNavbarAvenues() {
     avenues.forEach(a => {
       let href = '#';
       if (a.link) {
-        href = prefix + a.link;
-      } else {
-        // Fallback for new avenues without specific files
-        // Maybe link to a generic viewer? For now, just #
+        // Fix link if it already contains 'avenues/' and we are in 'pages/'
+        // a.link is like 'avenues/community-service.html'
+        
+        if (prefix === '../') {
+           href = prefix + a.link;
+        } else if (prefix === '') {
+           href = a.link;
+        } else {
+           href = prefix + a.link;
+        }
       }
       
       const li = document.createElement('li');

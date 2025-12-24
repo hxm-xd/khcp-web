@@ -42,7 +42,12 @@
           <h2>Manage Avenues</h2>
         </div>
 
-        <form id="avenueForm" class="form-stack">
+        <p class="text-muted" style="margin-bottom: 20px">
+          Select an avenue below to edit its details. New avenues cannot be
+          added.
+        </p>
+
+        <form id="avenueForm" class="form-stack" style="display: none">
           <div class="form-row">
             <div class="form-group">
               <label for="avenueName">Avenue Name</label>
@@ -50,6 +55,8 @@
                 id="avenueName"
                 placeholder="e.g. Community Service"
                 required
+                readonly
+                style="background-color: #f1f5f9; cursor: not-allowed"
               />
             </div>
             <div class="form-group">
@@ -66,14 +73,31 @@
             ></textarea>
           </div>
 
+          <div class="form-row">
+            <div class="form-group">
+              <label for="stat1Label">Stat 1 Label</label>
+              <input id="stat1Label" placeholder="e.g. Outreach Campaigns" />
+            </div>
+            <div class="form-group">
+              <label for="stat1Value">Stat 1 Value</label>
+              <input id="stat1Value" placeholder="e.g. 10+" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="stat2Label">Stat 2 Label</label>
+              <input id="stat2Label" placeholder="e.g. Volunteer Teams" />
+            </div>
+            <div class="form-group">
+              <label for="stat2Value">Stat 2 Value</label>
+              <input id="stat2Value" placeholder="e.g. 5" />
+            </div>
+          </div>
+
           <div class="form-actions">
-            <button class="btn btn-primary" type="submit">Add Avenue</button>
-            <button
-              class="btn ghost"
-              type="button"
-              id="cancelEdit"
-              style="display: none"
-            >
+            <button class="btn btn-primary" type="submit">Update Avenue</button>
+            <button class="btn ghost" type="button" id="cancelEdit">
               Cancel
             </button>
           </div>
