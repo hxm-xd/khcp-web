@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, where, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR97VU9ug7TVOLpzY1Tz1NkOjbrzrfQWk",
@@ -53,6 +53,74 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
     }
   }
   loadStats();
+
+  async function loadHomeProjects() {
+    const container = document.getElementById('homeProjectsGrid');
+    const seeMoreBtn = document.getElementById('seeMoreBtn');
+    if (!container) return;
+
+    try {
+      // Order by date desc
+      const q = query(collection(db, 'projects'), orderBy('date', 'desc'), limit(4)); 
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        container.innerHTML = '<p>No projects to display.</p>';
+        if (seeMoreBtn) seeMoreBtn.style.display = 'none';
+        return;
+      }
+
+      container.innerHTML = '';
+      let count = 0;
+      snap.forEach(doc => {
+        if (count >= 3) return; // Only show 3
+        const p = doc.data();
+        const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+        const html = `
+          <div class="project-card" data-aos="fade-up">
+            <div class="project-image">
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-hands-helping"></i>'}
+            </div>
+            <div class="project-content">
+              <h3>${escapeHtml(p.title)}</h3>
+              <p>${escapeHtml(p.description || p.avenue)}</p>
+              <div class="project-stats">
+                <span class="project-stat">
+                  <i class="fas fa-tag"></i>
+                  ${escapeHtml(p.avenue)}
+                </span>
+                <span class="project-stat">
+                  <i class="fas fa-calendar"></i>
+                  ${dateStr}
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        count++;
+      });
+
+      if (seeMoreBtn) {
+        if (snap.size > 3) {
+          seeMoreBtn.style.display = 'inline-block';
+        } else {
+          seeMoreBtn.style.display = 'none';
+        }
+      }
+
+    } catch (e) {
+      console.error("Error loading home projects", e);
+      // Fallback to createdAt if date fails (e.g. index missing)
+      if (e.code === 'failed-precondition') {
+         console.log("Index missing or field missing, trying createdAt");
+         // ... could implement fallback logic here but keeping it simple for now
+      }
+    }
+  }
+  loadHomeProjects();
 }
 
 // 2. Blog Page
@@ -104,11 +172,11 @@ if (page === 'blog.html') {
 // 3. Projects Page
 if (page === 'projects.html') {
   async function loadProjects() {
-    const container = document.querySelector('.projects-grid');
+    const container = document.getElementById('projectsContainer');
     if (!container) return;
 
     try {
-      const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'));
+      const q = query(collection(db, 'projects'), orderBy('date', 'desc'));
       const snap = await getDocs(q);
       
       if (snap.empty) {
@@ -117,28 +185,60 @@ if (page === 'projects.html') {
       }
 
       container.innerHTML = '';
+      
+      // Group by Month Year
+      const groups = {};
+      const groupKeys = [];
+      
       snap.forEach(doc => {
         const p = doc.data();
+        const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
+        const monthYear = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         
-        const html = `
-          <div class="project-card" data-aos="fade-up">
-            <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
-            </div>
-            <div class="project-content">
-              <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(p.description || p.avenue)}</p>
-              <div class="project-stats">
-                <span class="project-stat">
-                  <i class="fas fa-tag"></i>
-                  ${escapeHtml(p.avenue)}
-                </span>
-              </div>
+        if (!groups[monthYear]) {
+          groups[monthYear] = [];
+          groupKeys.push(monthYear);
+        }
+        groups[monthYear].push(p);
+      });
+
+      groupKeys.forEach(key => {
+        const projects = groups[key];
+        
+        const sectionHtml = `
+          <div class="month-section" style="margin-bottom: 40px;">
+            <h3 style="margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">${escapeHtml(key)}</h3>
+            <div class="projects-grid">
+              ${projects.map(p => {
+                 const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
+                 const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                 return `
+                <div class="project-card" data-aos="fade-up">
+                  <div class="project-image">
+                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
+                  </div>
+                  <div class="project-content">
+                    <h3>${escapeHtml(p.title)}</h3>
+                    <p>${escapeHtml(p.description || p.avenue)}</p>
+                    <div class="project-stats">
+                      <span class="project-stat">
+                        <i class="fas fa-tag"></i>
+                        ${escapeHtml(p.avenue)}
+                      </span>
+                      <span class="project-stat">
+                        <i class="fas fa-calendar"></i>
+                        ${dateStr}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              `}).join('')}
             </div>
           </div>
         `;
-        container.insertAdjacentHTML('beforeend', html);
+        container.insertAdjacentHTML('beforeend', sectionHtml);
       });
+
     } catch (e) {
       console.error("Error loading projects", e);
     }

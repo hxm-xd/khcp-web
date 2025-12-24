@@ -326,6 +326,7 @@ if (page === 'projects.html') {
   const form = document.getElementById('projectForm');
   const titleInput = document.getElementById('projectTitle');
   const avenueInput = document.getElementById('projectAvenue');
+  const dateInput = document.getElementById('projectDate');
   const imageInput = document.getElementById('projectImage');
   const descInput = document.getElementById('projectDescription');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
@@ -339,9 +340,15 @@ if (page === 'projects.html') {
       const snap = await getDocs(collection(db, 'projects'));
       const projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
+      // Sort by date desc
+      projects.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+
       renderList(list, projects, (p) => `
         <h4>${escapeHtml(p.title)}</h4>
-        <div class="meta">${escapeHtml(p.avenue || 'No Avenue')}</div>
+        <div class="meta">
+          ${escapeHtml(p.avenue || 'No Avenue')} • 
+          ${p.date ? new Date(p.date).toLocaleDateString() : 'No Date'}
+        </div>
       `);
     } catch (e) {
       console.error("Error loading projects", e);
@@ -357,6 +364,7 @@ if (page === 'projects.html') {
       const data = {
         title: titleInput.value,
         avenue: avenueInput.value,
+        date: dateInput.value || new Date().toISOString().split('T')[0],
         imageUrl: imageInput ? imageInput.value : '',
         description: descInput ? descInput.value : '',
         createdAt: Date.now()
@@ -398,6 +406,7 @@ if (page === 'projects.html') {
         
         titleInput.value = project.title;
         avenueInput.value = project.avenue;
+        dateInput.value = project.date || '';
         if(imageInput) imageInput.value = project.imageUrl || '';
         if(descInput) descInput.value = project.description || '';
         
