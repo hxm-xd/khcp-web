@@ -208,3 +208,52 @@ if (path.includes('/avenues/')) {
   }
   loadDirectors();
 }
+
+// 5. Dynamic Navbar Avenues
+async function loadNavbarAvenues() {
+  const dropdown = document.querySelector('.nav-menu .dropdown');
+  if (!dropdown) return;
+
+  try {
+    const snap = await getDocs(collection(db, 'avenues'));
+    if (snap.empty) return; // Keep default if empty or error
+
+    const avenues = snap.docs.map(d => d.data());
+    
+    // Determine prefix based on current location
+    let prefix = '';
+    if (path.endsWith('index.html') || path === '/') {
+      prefix = 'pages/'; // from root to pages/avenues/...
+    } else if (path.includes('/avenues/')) {
+      prefix = '../'; // from pages/avenues/ to pages/ (then + link which is avenues/...) -> wait.
+      // The link in DB is "avenues/community-service.html"
+      // If I am in "pages/avenues/", I want "community-service.html".
+      // So "avenues/community-service.html" needs to become "community-service.html"
+      // OR I can just go up to pages: "../" -> "pages/". Then append "avenues/..." -> "../avenues/community-service.html".
+      // Yes, "../avenues/community-service.html" works from "pages/avenues/".
+      prefix = '../';
+    } else if (path.includes('/pages/')) {
+      // e.g. pages/about.html. Link "avenues/..." works directly.
+      prefix = '';
+    }
+
+    dropdown.innerHTML = '';
+    avenues.forEach(a => {
+      let href = '#';
+      if (a.link) {
+        href = prefix + a.link;
+      } else {
+        // Fallback for new avenues without specific files
+        // Maybe link to a generic viewer? For now, just #
+      }
+      
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="${href}">${escapeHtml(a.name)}</a>`;
+      dropdown.appendChild(li);
+    });
+
+  } catch (e) {
+    console.error("Error loading navbar avenues", e);
+  }
+}
+loadNavbarAvenues();

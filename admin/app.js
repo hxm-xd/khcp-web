@@ -124,7 +124,30 @@ if (page === 'dashboard.html') {
       }
     }
   }
+
+  async function seedAvenues() {
+    try {
+      const snap = await getDocs(collection(db, 'avenues'));
+      if (snap.empty) {
+        const defaults = [
+          { name: 'Community Service', link: 'avenues/community-service.html' },
+          { name: 'Club Service', link: 'avenues/club-service.html' },
+          { name: 'Professional Development', link: 'avenues/professional-development.html' },
+          { name: 'International Service', link: 'avenues/international-service.html' }
+        ];
+        for (const a of defaults) {
+          await addDoc(collection(db, 'avenues'), a);
+        }
+        console.log('Seeded avenues');
+        loadCounts(); // reload counts
+      }
+    } catch (e) {
+      console.error("Error seeding avenues", e);
+    }
+  }
+
   loadCounts();
+  seedAvenues();
 }
 
 // Blog Logic
