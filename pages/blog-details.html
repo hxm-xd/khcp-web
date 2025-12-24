@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Blog Post - Rotaract Club of Kandy Hill Capital"
+    />
+    <title>Blog Post | Rotaract Club of Kandy Hill Capital</title>
+    <link rel="stylesheet" href="../styles/styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
+    <style>
+      .detail-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .detail-header {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+      .detail-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+      }
+      .detail-meta {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        color: var(--text-light);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+      }
+      .detail-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .detail-image {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
+      .detail-content {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-dark);
+      }
+      .detail-content p {
+        margin-bottom: 1.5rem;
+      }
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+      }
+      .back-btn:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+      }
+      /* Loading State */
+      .skeleton {
+        background: #eee;
+        background: linear-gradient(
+          110deg,
+          #ececec 8%,
+          #f5f5f5 18%,
+          #ececec 33%
+        );
+        border-radius: 5px;
+        background-size: 200% 100%;
+        animation: 1.5s shine linear infinite;
+      }
+      @keyframes shine {
+        to {
+          background-position-x: -200%;
+        }
+      }
+      .skeleton-title {
+        height: 40px;
+        width: 70%;
+        margin: 0 auto 1rem;
+      }
+      .skeleton-meta {
+        height: 20px;
+        width: 40%;
+        margin: 0 auto 2rem;
+      }
+      .skeleton-image {
+        height: 400px;
+        width: 100%;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+      }
+      .skeleton-text {
+        height: 20px;
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-screen">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-logo">
+          <img
+            src="../images/KHCP-Logo.png"
+            alt="Rotaract Club of Kandy Hill Capital Logo"
+            class="logo-image"
+          />
+        </div>
+        <ul class="nav-menu">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li class="has-dropdown">
+            <a href="avenues.html" aria-haspopup="true" aria-expanded="false"
+              >Avenues <span class="chev">▾</span></a
+            >
+            <ul class="dropdown">
+              <li>
+                <a href="avenues/community-service.html">Community Service</a>
+              </li>
+              <li>
+                <a href="avenues/club-service.html">Club Service</a>
+              </li>
+              <li>
+                <a href="avenues/professional-development.html"
+                  >Professional Development</a
+                >
+              </li>
+              <li>
+                <a href="avenues/international-service.html"
+                  >International Service</a
+                >
+              </li>
+            </ul>
+          </li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="nav-social" aria-hidden="false">
+          <a
+            href="https://web.facebook.com/rac.khcp"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="KHCP Facebook"
+          >
+            <i class="fab fa-facebook"></i>
+          </a>
+          <a
+            href="https://www.instagram.com/rac_khcp/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="KHCP Instagram"
+          >
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a
+            href="https://www.linkedin.com/company/rotaractkhcp/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="KHCP LinkedIn"
+          >
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </div>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </div>
+    </nav>
+
+    <section
+      class="blog-detail"
+      style="padding-top: 140px; padding-bottom: 80px"
+    >
+      <div class="container detail-container" id="detailContainer">
+        <!-- Skeleton Loading State -->
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-meta"></div>
+        <div class="skeleton skeleton-image"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text"></div>
+        <div class="skeleton skeleton-text" style="width: 80%"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-section">
+            <div class="footer-logo">
+              <img
+                src="../images/KHCP-Logo.png"
+                alt="Rotaract Club of Kandy Hill Capital Logo"
+                class="footer-logo-image"
+              />
+            </div>
+            <p>
+              Empowering young leaders to create positive change through
+              community service and professional development.
+            </p>
+            <div class="social-links">
+              <a href="https://web.facebook.com/rac.khcp"
+                ><i class="fab fa-facebook"></i
+              ></a>
+              <a href="https://www.instagram.com/rac_khcp/"
+                ><i class="fab fa-instagram"></i
+              ></a>
+              <a href="https://www.linkedin.com/company/rotaractkhcp/"
+                ><i class="fab fa-linkedin"></i
+              ></a>
+            </div>
+          </div>
+          <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="about.html">About</a></li>
+              <li><a href="projects.html">Projects</a></li>
+              <li><a href="avenues.html">Avenues</a></li>
+              <li><a href="blog.html">Blog</a></li>
+              <li><a href="contact.html">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>
+            &copy; 2025 Rotaract Club of Kandy Hill Capital. All rights
+            reserved.
+          </p>
+          <div class="developer-credit">
+            <a
+              href="https://www.linkedin.com/in/hamood-thariq-979409289/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Hamood Thariq LinkedIn"
+            >
+              Developed by <span class="hamood">Hamood Thariq</span> |
+              <span class="altair">Altair IT</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/script.js"></script>
+    <script type="module" src="../js/firebase-public.js"></script>
+  </body>
+</html>

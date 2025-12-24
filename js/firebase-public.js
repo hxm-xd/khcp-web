@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, where, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, where, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR97VU9ug7TVOLpzY1Tz1NkOjbrzrfQWk",
@@ -96,6 +96,7 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
                   ${dateStr}
                 </span>
               </div>
+              <a href="/pages/project-details.html?id=${doc.id}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -157,6 +158,7 @@ if (page === 'blog.html') {
                   ${date}
                 </span>
               </div>
+              <a href="blog-details.html?id=${doc.id}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -191,7 +193,7 @@ if (page === 'projects.html') {
       const groupKeys = [];
       
       snap.forEach(doc => {
-        const p = doc.data();
+        const p = { id: doc.id, ...doc.data() };
         const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
         const monthYear = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         
@@ -230,6 +232,7 @@ if (page === 'projects.html') {
                         ${dateStr}
                       </span>
                     </div>
+                    <a href="project-details.html?id=${p.id || ''}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
                   </div>
                 </div>
               `}).join('')}
@@ -507,4 +510,115 @@ async function loadNavbarAvenues() {
     console.error("Error loading navbar avenues", e);
   }
 }
+
+// 6. Project Details Page
+if (page === 'project-details.html') {
+  async function loadProjectDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const container = document.getElementById('detailContainer');
+
+    if (!id) {
+      container.innerHTML = '<p>Project not found.</p><a href="projects.html" class="back-btn">&larr; Back to Projects</a>';
+      return;
+    }
+
+    try {
+      const docRef = doc(db, 'projects', id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const p = docSnap.data();
+        const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+        container.innerHTML = `
+          <div class="detail-header" data-aos="fade-up">
+            <h1 class="detail-title">${escapeHtml(p.title)}</h1>
+            <div class="detail-meta">
+              <span><i class="fas fa-tag"></i> ${escapeHtml(p.avenue)}</span>
+              <span><i class="fas fa-calendar"></i> ${dateStr}</span>
+              ${p.chair ? `<span><i class="fas fa-user"></i> ${escapeHtml(p.chair)}</span>` : ''}
+            </div>
+          </div>
+          
+          ${p.imageUrl ? `
+          <div data-aos="fade-up" data-aos-delay="100">
+            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" class="detail-image">
+          </div>` : ''}
+
+          <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
+            ${p.description ? `<p>${escapeHtml(p.description).replace(/\n/g, '<br>')}</p>` : ''}
+            ${p.content ? `<div class="rich-text">${p.content}</div>` : ''} 
+          </div>
+
+          <div style="text-align: center; margin-top: 3rem;">
+            <a href="projects.html" class="back-btn">&larr; Back to Projects</a>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '<p>Project not found.</p><a href="projects.html" class="back-btn">&larr; Back to Projects</a>';
+      }
+    } catch (e) {
+      console.error("Error loading project details", e);
+      container.innerHTML = '<p>Error loading project details.</p><a href="projects.html" class="back-btn">&larr; Back to Projects</a>';
+    }
+  }
+  loadProjectDetails();
+}
+
+// 7. Blog Details Page
+if (page === 'blog-details.html') {
+  async function loadBlogDetails() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const container = document.getElementById('detailContainer');
+
+    if (!id) {
+      container.innerHTML = '<p>Post not found.</p><a href="blog.html" class="back-btn">&larr; Back to Blog</a>';
+      return;
+    }
+
+    try {
+      const docRef = doc(db, 'posts', id);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const p = docSnap.data();
+        const dateObj = p.createdAt ? new Date(p.createdAt) : new Date();
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+        container.innerHTML = `
+          <div class="detail-header" data-aos="fade-up">
+            <h1 class="detail-title">${escapeHtml(p.title)}</h1>
+            <div class="detail-meta">
+              <span><i class="fas fa-calendar"></i> ${dateStr}</span>
+              ${p.author ? `<span><i class="fas fa-user"></i> ${escapeHtml(p.author)}</span>` : ''}
+            </div>
+          </div>
+          
+          ${p.imageUrl ? `
+          <div data-aos="fade-up" data-aos-delay="100">
+            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" class="detail-image">
+          </div>` : ''}
+
+          <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
+            ${p.content ? `<div class="rich-text">${p.content}</div>` : `<p>${escapeHtml(p.excerpt || '')}</p>`}
+          </div>
+
+          <div style="text-align: center; margin-top: 3rem;">
+            <a href="blog.html" class="back-btn">&larr; Back to Blog</a>
+          </div>
+        `;
+      } else {
+        container.innerHTML = '<p>Post not found.</p><a href="blog.html" class="back-btn">&larr; Back to Blog</a>';
+      }
+    } catch (e) {
+      console.error("Error loading blog details", e);
+      container.innerHTML = '<p>Error loading blog details.</p><a href="blog.html" class="back-btn">&larr; Back to Blog</a>';
+    }
+  }
+  loadBlogDetails();
+}
+
 loadNavbarAvenues();
