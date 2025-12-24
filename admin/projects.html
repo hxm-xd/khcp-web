@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Manage Projects — Admin</title>
     <link rel="stylesheet" href="./styles.css" />
-    <script defer src="./app.js"></script>
+    <script type="module" src="./app.js"></script>
   </head>
   <body>
     <header class="admin-header">
@@ -35,6 +35,12 @@
         <form id="projectForm" class="form-inline">
           <input id="projectTitle" placeholder="Title" required />
           <input id="projectAvenue" placeholder="Avenue (optional)" />
+          <input id="projectImage" placeholder="Image URL" />
+          <textarea
+            id="projectDescription"
+            placeholder="Description"
+            style="width: 100%; margin-top: 10px"
+          ></textarea>
           <button class="btn btn-primary" type="submit">Add / Save</button>
         </form>
 

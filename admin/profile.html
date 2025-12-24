@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Admin Profile — KHCP</title>
     <link rel="stylesheet" href="./styles.css" />
-    <script defer src="./app.js"></script>
+    <script type="module" src="./app.js"></script>
   </head>
   <body>
     <header class="admin-header">
@@ -32,11 +32,45 @@
     <main class="admin-main">
       <section class="manage">
         <h2>Profile</h2>
-        <form id="profileForm" class="form-inline">
+        <form
+          id="profileForm"
+          class="form-stacked"
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+          "
+        >
+          <label>Name</label>
           <input id="adminName" placeholder="Name" required />
+          <label>Email</label>
           <input id="adminEmail" placeholder="Email" required />
-          <input id="adminPassword" placeholder="New password (optional)" />
           <button class="btn btn-primary" type="submit">Save Profile</button>
+        </form>
+
+        <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee" />
+
+        <h2>Home Page Statistics</h2>
+        <form
+          id="statsForm"
+          class="form-stacked"
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+          "
+        >
+          <label>Active Members</label>
+          <input id="statMembers" placeholder="e.g. 50+" />
+          <label>Projects Completed</label>
+          <input id="statProjects" placeholder="e.g. 25+" />
+          <label>Years of Service</label>
+          <input id="statYears" placeholder="e.g. 5+" />
+          <label>Hours Volunteered</label>
+          <input id="statHours" placeholder="e.g. 1000+" />
+          <button class="btn btn-primary" type="submit">Save Stats</button>
         </form>
       </section>
     </main>
