@@ -4,9 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Admin Login — KHCP</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
     <link rel="stylesheet" href="../styles/styles.css" />
-    <script type="module" src="./app.js"></script>
+    <script type="module" src="./js/app.js"></script>
   </head>
   <body class="admin-page">
     <main class="admin-main">
@@ -74,13 +74,9 @@
                 <a href="../index.html" class="btn ghost">Back to site</a>
               </div>
 
-              <p
-                id="loginError"
-                class="muted small"
-                style="color: tomato; display: none; margin-top: 10px"
-              ></p>
+              <p id="loginError" class="muted small text-error hidden mt-2"></p>
             </form>
-            <p class="muted small" style="margin-top: 12px">
+            <p class="muted small mt-3">
               Tip: this is a frontend-only demo admin. Any credentials will
               work.
             </p>
@@ -88,20 +84,5 @@
         </div>
       </div>
     </main>
-
-    <style>
-      /* small helper to hide labels visually but keep for screen readers */
-      .sr-only {
-        position: absolute !important;
-        width: 1px !important;
-        height: 1px !important;
-        padding: 0 !important;
-        margin: -1px !important;
-        overflow: hidden !important;
-        clip: rect(0, 0, 0, 0) !important;
-        white-space: nowrap !important;
-        border: 0 !important;
-      }
-    </style>
   </body>
 </html>
