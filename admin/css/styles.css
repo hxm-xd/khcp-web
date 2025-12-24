@@ -471,6 +471,10 @@ input:focus, select:focus, textarea:focus {
     margin-top: 1rem;
 }
 
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
 .mb-5 {
     margin-bottom: 1.25rem;
 }

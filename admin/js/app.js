@@ -600,17 +600,23 @@ if (page === 'directors.html') {
   const avenueInput = document.getElementById('directorAvenue');
   const yearInput = document.getElementById('directorYear');
   const imageInput = document.getElementById('directorImage');
+  const filterAvenue = document.getElementById('filterAvenue');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
 
   populateAvenueSelect('directorAvenue');
+  populateAvenueSelect('filterAvenue');
 
   async function loadDirectors() {
     try {
       const snap = await getDocs(collection(db, 'directors'));
-      const directors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      let directors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
+      if (filterAvenue && filterAvenue.value !== 'all') {
+        directors = directors.filter(d => d.avenue === filterAvenue.value);
+      }
+
       // Sort by year desc, then name
       directors.sort((a, b) => (b.year || 0) - (a.year || 0));
 
@@ -624,6 +630,10 @@ if (page === 'directors.html') {
       console.error("Error loading directors", e);
       showToast("Error loading directors", "error");
     }
+  }
+
+  if (filterAvenue) {
+    filterAvenue.addEventListener('change', loadDirectors);
   }
 
   if (form) {
