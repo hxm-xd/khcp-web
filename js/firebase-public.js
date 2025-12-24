@@ -339,6 +339,64 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
   }
   loadDirectors();
 
+  async function loadAvenueProjects() {
+    const container = document.getElementById('avenueProjectsGrid');
+    if (!container) return;
+
+    // Determine avenue from filename
+    let avenueName = '';
+    if (page.includes('community-service')) avenueName = 'Community Service';
+    else if (page.includes('club-service')) avenueName = 'Club Service';
+    else if (page.includes('professional-development')) avenueName = 'Professional Development';
+    else if (page.includes('international-service')) avenueName = 'International Service';
+
+    if (!avenueName) return;
+
+    try {
+      const q = query(collection(db, 'projects'), orderBy('date', 'desc'));
+      const snap = await getDocs(q);
+      
+      // Filter client-side to handle potential case/whitespace issues
+      const projects = snap.docs
+        .map(d => d.data())
+        .filter(p => p.avenue && p.avenue.trim().toLowerCase() === avenueName.toLowerCase());
+
+      if (projects.length === 0) {
+        container.innerHTML = '<p>No projects listed for this avenue yet.</p>';
+        return;
+      }
+
+      container.innerHTML = '';
+      projects.forEach(p => {
+        const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
+        const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        
+        const html = `
+          <div class="project-card" data-aos="fade-up">
+            <div class="project-image">
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
+            </div>
+            <div class="project-content">
+              <h3>${escapeHtml(p.title)}</h3>
+              <p>${escapeHtml(p.description || '')}</p>
+              <div class="project-stats">
+                <span class="project-stat">
+                  <i class="fas fa-calendar"></i>
+                  ${dateStr}
+                </span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+      });
+
+    } catch (e) {
+      console.error("Error loading avenue projects", e);
+    }
+  }
+  loadAvenueProjects();
+
   async function loadAvenueDetails() {
     // Determine avenue from filename
     let avenueName = '';
