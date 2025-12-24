@@ -31,12 +31,47 @@
 
     <main class="admin-main">
       <section class="manage">
-        <h2>Avenue Directors</h2>
-        <form id="directorForm" class="form-inline">
-          <input id="directorName" placeholder="Name" required />
-          <input id="directorAvenue" placeholder="Avenue" />
-          <input id="directorImage" placeholder="Image URL" />
-          <button class="btn btn-primary" type="submit">Add / Save</button>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+          "
+        >
+          <h2>Manage Directors</h2>
+        </div>
+
+        <form id="directorForm" class="form-stack">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="directorName">Full Name</label>
+              <input id="directorName" placeholder="e.g. John Doe" required />
+            </div>
+            <div class="form-group">
+              <label for="directorAvenue">Avenue / Role</label>
+              <select id="directorAvenue">
+                <option value="">Select Avenue...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="directorImage">Profile Image URL</label>
+            <input id="directorImage" placeholder="https://..." />
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Add Director</button>
+            <button
+              class="btn ghost"
+              type="button"
+              id="cancelEdit"
+              style="display: none"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
 
         <div id="directorsList" class="list"></div>

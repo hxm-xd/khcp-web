@@ -19,7 +19,112 @@ const db = getFirestore(app);
 
 const page = window.location.pathname.split('/').pop();
 
-// Auth State Observer
+// --- UI Helpers ---
+
+function showToast(message, type = 'success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+function resetForm(form, submitBtn, defaultText = 'Add') {
+  form.reset();
+  submitBtn.textContent = defaultText;
+  const cancelBtn = form.querySelector('#cancelEdit');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  return null; // to reset editId
+}
+
+function setupCancelButton(form, submitBtn, defaultText, resetCallback) {
+  const cancelBtn = form.querySelector('#cancelEdit');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      resetCallback();
+      resetForm(form, submitBtn, defaultText);
+    });
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function renderList(container, items, renderContentFn) {
+  container.innerHTML = '';
+  if (!items || items.length === 0) {
+    container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">No items found.</p>';
+    return;
+  }
+  items.forEach((item, index) => {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.style.animationDelay = `${index * 0.05}s`; // Staggered animation
+    
+    // Common structure: Image (optional) + Content + Actions
+    let imageHtml = '';
+    if (item.imageUrl) {
+      imageHtml = `<img src="${escapeHtml(item.imageUrl)}" alt="Image" onerror="this.style.display='none'">`;
+    } else if (item.image) { // handle inconsistent naming if any
+      imageHtml = `<img src="${escapeHtml(item.image)}" alt="Image" onerror="this.style.display='none'">`;
+    }
+
+    el.innerHTML = `
+      <div class="item-flex" style="width:100%">
+        ${imageHtml}
+        <div class="content">
+          ${renderContentFn(item)}
+        </div>
+        <div class="actions">
+          <button class="btn ghost" data-action="edit" data-id="${item.id}">Edit</button>
+          <button class="btn danger" data-action="delete" data-id="${item.id}">Delete</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+async function populateAvenueSelect(selectId) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  
+  try {
+    const snap = await getDocs(collection(db, 'avenues'));
+    const avenues = snap.docs.map(d => d.data().name).sort();
+    
+    // Keep the first option (placeholder)
+    const firstOption = select.options[0];
+    select.innerHTML = '';
+    select.appendChild(firstOption);
+
+    avenues.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      select.appendChild(opt);
+    });
+  } catch (e) {
+    console.error("Error populating avenues", e);
+  }
+}
+
+// --- Auth Logic ---
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
     if (page === 'index.html' || page === '') {
@@ -32,7 +137,6 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Logout
 document.addEventListener('click', async (e) => {
   if (e.target && e.target.id === 'logoutBtn') {
     e.preventDefault();
@@ -45,7 +149,6 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-// Login Page Logic
 if (page === 'index.html' || page === '') {
   const form = document.getElementById('loginForm');
   const err = document.getElementById('loginError');
@@ -72,7 +175,6 @@ if (page === 'index.html' || page === '') {
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        // Redirect handled by onAuthStateChanged
       } catch (error) {
         if (err) {
           err.style.display = 'block';
@@ -84,33 +186,8 @@ if (page === 'index.html' || page === '') {
   }
 }
 
-// Generic List Renderer
-function renderList(container, items, renderItem) {
-  container.innerHTML = '';
-  if (!items || items.length === 0) {
-    container.innerHTML = '<p class="muted">No items yet.</p>';
-    return;
-  }
-  items.forEach(item => {
-    const el = document.createElement('div');
-    el.className = 'item';
-    el.innerHTML = renderItem(item);
-    container.appendChild(el);
-  });
-}
+// --- Dashboard Logic ---
 
-// Helper to escape HTML
-function escapeHtml(text) {
-  if (!text) return '';
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-// Dashboard Logic
 if (page === 'dashboard.html') {
   async function loadCounts() {
     const collections = ['posts', 'avenues', 'directors', 'projects'];
@@ -139,7 +216,7 @@ if (page === 'dashboard.html') {
           await addDoc(collection(db, 'avenues'), a);
         }
         console.log('Seeded avenues');
-        loadCounts(); // reload counts
+        loadCounts();
       }
     } catch (e) {
       console.error("Error seeding avenues", e);
@@ -150,14 +227,16 @@ if (page === 'dashboard.html') {
   seedAvenues();
 }
 
-// Blog Logic
+// --- Blog Logic ---
+
 if (page === 'blog.html') {
   const list = document.getElementById('postsList');
   const form = document.getElementById('postForm');
   const titleInput = document.getElementById('postTitle');
   const excerptInput = document.getElementById('postExcerpt');
-  const imageInput = document.getElementById('postImage'); // New input
-  const contentInput = document.getElementById('postContent'); // New input
+  const imageInput = document.getElementById('postImage');
+  const contentInput = document.getElementById('postContent');
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
 
@@ -168,22 +247,18 @@ if (page === 'blog.html') {
       const posts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
       renderList(list, posts, (p) => `
-        <div>
-          <strong>${escapeHtml(p.title)}</strong>
-          <div class="meta">${escapeHtml(p.excerpt || '')}</div>
-          ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" style="max-height:50px; margin-top:5px;">` : ''}
-        </div>
-        <div>
-          <button class="btn" data-action="edit" data-id="${p.id}">Edit</button>
-          <button class="btn" data-action="delete" data-id="${p.id}">Delete</button>
-        </div>
+        <h4>${escapeHtml(p.title)}</h4>
+        <div class="meta">${escapeHtml(p.excerpt || '')}</div>
       `);
     } catch (e) {
       console.error("Error loading posts", e);
+      showToast("Error loading posts", "error");
     }
   }
 
   if (form) {
+    setupCancelButton(form, submitBtn, 'Add Post', () => { editId = null; });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -197,16 +272,16 @@ if (page === 'blog.html') {
       try {
         if (editId) {
           await updateDoc(doc(db, 'posts', editId), data);
-          editId = null;
-          form.querySelector('button[type="submit"]').textContent = 'Add Post';
+          showToast("Post updated successfully");
         } else {
           await addDoc(collection(db, 'posts'), data);
+          showToast("Post created successfully");
         }
-        form.reset();
+        editId = resetForm(form, submitBtn, 'Add Post');
         loadPosts();
       } catch (err) {
         console.error("Error saving post", err);
-        alert("Error saving post: " + err.message);
+        showToast("Error saving post: " + err.message, "error");
       }
     });
   }
@@ -221,6 +296,7 @@ if (page === 'blog.html') {
       if (action === 'delete') {
         if (confirm('Delete this post?')) {
           await deleteDoc(doc(db, 'posts', id));
+          showToast("Post deleted");
           loadPosts();
         }
       } else if (action === 'edit') {
@@ -233,7 +309,9 @@ if (page === 'blog.html') {
         if(contentInput) contentInput.value = post.content || '';
         
         editId = id;
-        form.querySelector('button[type="submit"]').textContent = 'Update Post';
+        submitBtn.textContent = 'Update Post';
+        form.querySelector('#cancelEdit').style.display = 'inline-block';
+        form.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
@@ -241,16 +319,20 @@ if (page === 'blog.html') {
   loadPosts();
 }
 
-// Projects Logic
+// --- Projects Logic ---
+
 if (page === 'projects.html') {
   const list = document.getElementById('projectsList');
   const form = document.getElementById('projectForm');
   const titleInput = document.getElementById('projectTitle');
   const avenueInput = document.getElementById('projectAvenue');
-  const imageInput = document.getElementById('projectImage'); // New input
-  const descInput = document.getElementById('projectDescription'); // New input
+  const imageInput = document.getElementById('projectImage');
+  const descInput = document.getElementById('projectDescription');
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
+
+  populateAvenueSelect('projectAvenue');
 
   async function loadProjects() {
     try {
@@ -258,22 +340,18 @@ if (page === 'projects.html') {
       const projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
       renderList(list, projects, (p) => `
-        <div>
-          <strong>${escapeHtml(p.title)}</strong>
-          <div class="meta">${escapeHtml(p.avenue || '')}</div>
-          ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" style="max-height:50px; margin-top:5px;">` : ''}
-        </div>
-        <div>
-          <button class="btn" data-action="edit" data-id="${p.id}">Edit</button>
-          <button class="btn" data-action="delete" data-id="${p.id}">Delete</button>
-        </div>
+        <h4>${escapeHtml(p.title)}</h4>
+        <div class="meta">${escapeHtml(p.avenue || 'No Avenue')}</div>
       `);
     } catch (e) {
       console.error("Error loading projects", e);
+      showToast("Error loading projects", "error");
     }
   }
 
   if (form) {
+    setupCancelButton(form, submitBtn, 'Add Project', () => { editId = null; });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -287,16 +365,16 @@ if (page === 'projects.html') {
       try {
         if (editId) {
           await updateDoc(doc(db, 'projects', editId), data);
-          editId = null;
-          form.querySelector('button[type="submit"]').textContent = 'Add Project';
+          showToast("Project updated");
         } else {
           await addDoc(collection(db, 'projects'), data);
+          showToast("Project added");
         }
-        form.reset();
+        editId = resetForm(form, submitBtn, 'Add Project');
         loadProjects();
       } catch (err) {
         console.error("Error saving project", err);
-        alert("Error saving project: " + err.message);
+        showToast("Error saving project", "error");
       }
     });
   }
@@ -311,6 +389,7 @@ if (page === 'projects.html') {
       if (action === 'delete') {
         if (confirm('Delete this project?')) {
           await deleteDoc(doc(db, 'projects', id));
+          showToast("Project deleted");
           loadProjects();
         }
       } else if (action === 'edit') {
@@ -323,7 +402,9 @@ if (page === 'projects.html') {
         if(descInput) descInput.value = project.description || '';
         
         editId = id;
-        form.querySelector('button[type="submit"]').textContent = 'Update Project';
+        submitBtn.textContent = 'Update Project';
+        form.querySelector('#cancelEdit').style.display = 'inline-block';
+        form.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
@@ -331,11 +412,15 @@ if (page === 'projects.html') {
   loadProjects();
 }
 
-// Avenues Logic
+// --- Avenues Logic ---
+
 if (page === 'avenues.html') {
   const list = document.getElementById('avenuesList');
   const form = document.getElementById('avenueForm');
   const nameInput = document.getElementById('avenueName');
+  const imageInput = document.getElementById('avenueImage');
+  const descInput = document.getElementById('avenueDescription');
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
 
@@ -345,34 +430,39 @@ if (page === 'avenues.html') {
       const avenues = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
       renderList(list, avenues, (a) => `
-        <div><strong>${escapeHtml(a.name)}</strong></div>
-        <div>
-          <button class="btn" data-action="edit" data-id="${a.id}">Edit</button>
-          <button class="btn" data-action="delete" data-id="${a.id}">Delete</button>
-        </div>
+        <h4>${escapeHtml(a.name)}</h4>
+        <div class="meta">${escapeHtml(a.description || '')}</div>
       `);
     } catch (e) {
       console.error("Error loading avenues", e);
+      showToast("Error loading avenues", "error");
     }
   }
 
   if (form) {
+    setupCancelButton(form, submitBtn, 'Add Avenue', () => { editId = null; });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = { name: nameInput.value };
+      const data = { 
+        name: nameInput.value,
+        imageUrl: imageInput ? imageInput.value : '',
+        description: descInput ? descInput.value : ''
+      };
 
       try {
         if (editId) {
           await updateDoc(doc(db, 'avenues', editId), data);
-          editId = null;
-          form.querySelector('button[type="submit"]').textContent = 'Add Avenue';
+          showToast("Avenue updated");
         } else {
           await addDoc(collection(db, 'avenues'), data);
+          showToast("Avenue added");
         }
-        form.reset();
+        editId = resetForm(form, submitBtn, 'Add Avenue');
         loadAvenues();
       } catch (err) {
         console.error("Error saving avenue", err);
+        showToast("Error saving avenue", "error");
       }
     });
   }
@@ -387,29 +477,39 @@ if (page === 'avenues.html') {
       if (action === 'delete') {
         if (confirm('Delete this avenue?')) {
           await deleteDoc(doc(db, 'avenues', id));
+          showToast("Avenue deleted");
           loadAvenues();
         }
       } else if (action === 'edit') {
         const snap = await getDocs(collection(db, 'avenues'));
         const avenue = snap.docs.find(d => d.id === id).data();
         nameInput.value = avenue.name;
+        if(imageInput) imageInput.value = avenue.imageUrl || '';
+        if(descInput) descInput.value = avenue.description || '';
+        
         editId = id;
-        form.querySelector('button[type="submit"]').textContent = 'Update Avenue';
+        submitBtn.textContent = 'Update Avenue';
+        form.querySelector('#cancelEdit').style.display = 'inline-block';
+        form.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
   if(list) loadAvenues();
 }
 
-// Directors Logic
+// --- Directors Logic ---
+
 if (page === 'directors.html') {
   const list = document.getElementById('directorsList');
   const form = document.getElementById('directorForm');
   const nameInput = document.getElementById('directorName');
   const avenueInput = document.getElementById('directorAvenue');
-  const imageInput = document.getElementById('directorImage'); // New input
+  const imageInput = document.getElementById('directorImage');
+  const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
+
+  populateAvenueSelect('directorAvenue');
 
   async function loadDirectors() {
     try {
@@ -417,22 +517,18 @@ if (page === 'directors.html') {
       const directors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       
       renderList(list, directors, (d) => `
-        <div>
-          <strong>${escapeHtml(d.name)}</strong>
-          <div class="meta">${escapeHtml(d.avenue || '')}</div>
-          ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" style="max-height:50px; margin-top:5px;">` : ''}
-        </div>
-        <div>
-          <button class="btn" data-action="edit" data-id="${d.id}">Edit</button>
-          <button class="btn" data-action="delete" data-id="${d.id}">Delete</button>
-        </div>
+        <h4>${escapeHtml(d.name)}</h4>
+        <div class="meta">${escapeHtml(d.avenue || '')}</div>
       `);
     } catch (e) {
       console.error("Error loading directors", e);
+      showToast("Error loading directors", "error");
     }
   }
 
   if (form) {
+    setupCancelButton(form, submitBtn, 'Add Director', () => { editId = null; });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -444,15 +540,16 @@ if (page === 'directors.html') {
       try {
         if (editId) {
           await updateDoc(doc(db, 'directors', editId), data);
-          editId = null;
-          form.querySelector('button[type="submit"]').textContent = 'Add Director';
+          showToast("Director updated");
         } else {
           await addDoc(collection(db, 'directors'), data);
+          showToast("Director added");
         }
-        form.reset();
+        editId = resetForm(form, submitBtn, 'Add Director');
         loadDirectors();
       } catch (err) {
         console.error("Error saving director", err);
+        showToast("Error saving director", "error");
       }
     });
   }
@@ -467,6 +564,7 @@ if (page === 'directors.html') {
       if (action === 'delete') {
         if (confirm('Delete this director?')) {
           await deleteDoc(doc(db, 'directors', id));
+          showToast("Director deleted");
           loadDirectors();
         }
       } else if (action === 'edit') {
@@ -476,19 +574,21 @@ if (page === 'directors.html') {
         avenueInput.value = director.avenue;
         if(imageInput) imageInput.value = director.imageUrl || '';
         editId = id;
-        form.querySelector('button[type="submit"]').textContent = 'Update Director';
+        submitBtn.textContent = 'Update Director';
+        form.querySelector('#cancelEdit').style.display = 'inline-block';
+        form.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
   if(list) loadDirectors();
 }
 
-// Profile Logic
+// --- Profile Logic ---
+
 if (page === 'profile.html') {
   const nameInput = document.getElementById('adminName');
   const emailInput = document.getElementById('adminEmail');
   
-  // Stats inputs
   const statMembers = document.getElementById('statMembers');
   const statProjects = document.getElementById('statProjects');
   const statYears = document.getElementById('statYears');
@@ -496,9 +596,6 @@ if (page === 'profile.html') {
 
   async function loadProfileAndStats() {
     try {
-      // Load Profile
-      const profileSnap = await getDocs(query(collection(db, 'settings'), orderBy('type'))); // simple query
-      // Actually let's just fetch all settings and filter in memory since it's small
       const settingsSnap = await getDocs(collection(db, 'settings'));
       
       const profileDoc = settingsSnap.docs.find(d => d.data().type === 'profile');
@@ -520,6 +617,7 @@ if (page === 'profile.html') {
       }
     } catch (e) {
       console.error("Error loading settings", e);
+      showToast("Error loading settings", "error");
     }
   }
 
@@ -535,10 +633,10 @@ if (page === 'profile.html') {
         const ref = await addDoc(collection(db, 'settings'), data);
         nameInput.dataset.id = ref.id;
       }
-      alert('Profile saved!');
+      showToast('Profile saved!');
     } catch (err) {
       console.error("Error saving profile", err);
-      alert("Error saving profile");
+      showToast("Error saving profile", "error");
     }
   });
 
@@ -562,10 +660,10 @@ if (page === 'profile.html') {
           const ref = await addDoc(collection(db, 'settings'), data);
           statMembers.dataset.id = ref.id;
         }
-        alert('Stats saved!');
+        showToast('Stats saved!');
       } catch (err) {
         console.error("Error saving stats", err);
-        alert("Error saving stats");
+        showToast("Error saving stats", "error");
       }
     });
   }
@@ -573,7 +671,8 @@ if (page === 'profile.html') {
   loadProfileAndStats();
 }
 
-// Analytics Logic
+// --- Analytics Logic ---
+
 if (page === 'analytics.html') {
   async function loadAnalytics() {
     try {
@@ -587,7 +686,6 @@ if (page === 'analytics.html') {
       const directorsCount = directorsSnap.size;
       const projectsCount = projectsSnap.size;
 
-      // counts chart
       const countsCtx = document.getElementById('countsChart').getContext('2d');
       new Chart(countsCtx, {
         type: 'bar',
@@ -597,11 +695,6 @@ if (page === 'analytics.html') {
         }, options:{responsive:true}
       });
 
-      // distribution dummy chart (avenues distribution)
-      // For real distribution, we'd need to count projects per avenue.
-      // Let's try to do that if we have time, but for now random is fine as per original code, 
-      // or better: count projects per avenue.
-      
       const projects = projectsSnap.docs.map(d => d.data());
       const avenues = avenuesSnap.docs.map(d => d.data());
       
@@ -629,7 +722,8 @@ if (page === 'analytics.html') {
   loadAnalytics();
 }
 
-// Admin mobile hamburger/menu behavior (applies across admin pages)
+// --- Mobile Menu ---
+
 try{
   const adminHamburger = document.getElementById('adminHamburger');
   const adminHeader = document.querySelector('.admin-header');
@@ -638,17 +732,11 @@ try{
     adminHamburger.addEventListener('click', function(e){
       const open = document.body.classList.toggle('admin-nav-open');
       adminHamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      // animate hamburger into X
       adminHamburger.classList.toggle('open', open);
     });
 
-    // Close menu when clicking outside header
     document.addEventListener('click', function(e){ if(!e.target.closest('.admin-header') && document.body.classList.contains('admin-nav-open')){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } });
-
-    // Close when pressing Escape
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && document.body.classList.contains('admin-nav-open')){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } });
-
-    // Close when a nav link is clicked (mobile)
     Array.from(adminNavLinks).forEach(a=> a.addEventListener('click', function(){ if(window.innerWidth <= 900){ document.body.classList.remove('admin-nav-open'); adminHamburger.setAttribute('aria-expanded','false'); } }));
   }
-}catch(e){ /* no-op if header missing */ }
+}catch(e){ }
