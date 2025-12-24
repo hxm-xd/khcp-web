@@ -2,6 +2,13 @@
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
 
+// Initialize AOS
+AOS.init({
+    duration: 1000,
+    once: true,
+    offset: 100
+});
+
 // Prevent user scrolling while the loading screen is active. We'll add
 // the `loading-active` class immediately so the CSS rule above can take effect
 // before the load event removes it.
