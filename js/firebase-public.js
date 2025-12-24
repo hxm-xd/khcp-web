@@ -29,6 +29,17 @@ function escapeHtml(text) {
     .replace(/'/g, "&#039;");
 }
 
+// Helper to strip HTML tags for excerpts
+function stripHtml(html) {
+  if (!html) return '';
+  // Create a temporary element
+  const tmp = document.createElement("DIV");
+  // Inject the HTML
+  tmp.innerHTML = html;
+  // Retrieve the text content
+  return tmp.textContent || tmp.innerText || "";
+}
+
 // 1. Home Page & About Page Stats
 if (page === 'index.html' || page === '' || page === 'about.html') {
   async function loadStats() {
@@ -85,7 +96,7 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(p.description || p.avenue)}</p>
+              <p>${escapeHtml(stripHtml(p.description || p.avenue)).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-tag"></i>
@@ -151,7 +162,7 @@ if (page === 'blog.html') {
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(p.excerpt)}</p>
+              <p>${escapeHtml(stripHtml(p.excerpt || p.content || '')).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-calendar"></i>
@@ -221,7 +232,7 @@ if (page === 'projects.html') {
                   </div>
                   <div class="project-content">
                     <h3>${escapeHtml(p.title)}</h3>
-                    <p>${escapeHtml(p.description || p.avenue)}</p>
+                    <p>${escapeHtml(stripHtml(p.description || p.avenue)).substring(0, 100)}...</p>
                     <div class="project-stats">
                       <span class="project-stat">
                         <i class="fas fa-tag"></i>
@@ -381,7 +392,7 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(p.description || '')}</p>
+              <p>${escapeHtml(stripHtml(p.description || '')).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-calendar"></i>
@@ -548,7 +559,7 @@ if (page === 'project-details.html') {
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
-            ${p.description ? `<p>${escapeHtml(p.description).replace(/\n/g, '<br>')}</p>` : ''}
+            ${p.description ? `<div class="rich-text">${p.description}</div>` : ''}
             ${p.content ? `<div class="rich-text">${p.content}</div>` : ''} 
           </div>
 

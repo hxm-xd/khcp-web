@@ -306,6 +306,24 @@ if (page === 'blog.html') {
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
+  let quill = null;
+
+  if (document.getElementById('postContentEditor')) {
+    quill = new Quill('#postContentEditor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'color': [] }, { 'background': [] }],
+          ['link', 'image'],
+          ['clean']
+        ]
+      }
+    });
+  }
 
   async function loadPosts() {
     try {
@@ -332,7 +350,7 @@ if (page === 'blog.html') {
         title: titleInput.value,
         excerpt: excerptInput.value,
         imageUrl: imageInput ? imageInput.value : '',
-        content: contentInput ? contentInput.value : '',
+        content: quill ? quill.root.innerHTML : (contentInput ? contentInput.value : ''),
         createdAt: Date.now()
       };
 
@@ -345,6 +363,7 @@ if (page === 'blog.html') {
           showToast("Post created successfully");
         }
         editId = resetForm(form, submitBtn, 'Add Post');
+        if (quill) quill.setText('');
         loadPosts();
       } catch (err) {
         console.error("Error saving post", err);
@@ -374,6 +393,7 @@ if (page === 'blog.html') {
         excerptInput.value = post.excerpt;
         if(imageInput) imageInput.value = post.imageUrl || '';
         if(contentInput) contentInput.value = post.content || '';
+        if(quill) quill.root.innerHTML = post.content || '';
         
         editId = id;
         submitBtn.textContent = 'Update Post';
@@ -399,6 +419,24 @@ if (page === 'projects.html') {
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
   let editId = null;
+  let quill = null;
+
+  if (document.getElementById('projectDescriptionEditor')) {
+    quill = new Quill('#projectDescriptionEditor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          [{ 'color': [] }, { 'background': [] }],
+          ['link', 'image'],
+          ['clean']
+        ]
+      }
+    });
+  }
 
   populateAvenueSelect('projectAvenue');
 
@@ -433,7 +471,7 @@ if (page === 'projects.html') {
         avenue: avenueInput.value,
         date: dateInput.value || new Date().toISOString().split('T')[0],
         imageUrl: imageInput ? imageInput.value : '',
-        description: descInput ? descInput.value : '',
+        description: quill ? quill.root.innerHTML : (descInput ? descInput.value : ''),
         createdAt: Date.now()
       };
 
@@ -446,6 +484,7 @@ if (page === 'projects.html') {
           showToast("Project added");
         }
         editId = resetForm(form, submitBtn, 'Add Project');
+        if (quill) quill.setText('');
         loadProjects();
       } catch (err) {
         console.error("Error saving project", err);
@@ -476,6 +515,7 @@ if (page === 'projects.html') {
         dateInput.value = project.date || '';
         if(imageInput) imageInput.value = project.imageUrl || '';
         if(descInput) descInput.value = project.description || '';
+        if(quill) quill.root.innerHTML = project.description || '';
         
         editId = id;
         submitBtn.textContent = 'Update Project';
