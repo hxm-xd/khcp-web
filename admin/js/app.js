@@ -300,6 +300,7 @@ if (page === 'blog.html') {
   const list = document.getElementById('postsList');
   const form = document.getElementById('postForm');
   const titleInput = document.getElementById('postTitle');
+  const authorInput = document.getElementById('postAuthor');
   const excerptInput = document.getElementById('postExcerpt');
   const imageInput = document.getElementById('postImage');
   const contentInput = document.getElementById('postContent');
@@ -348,6 +349,7 @@ if (page === 'blog.html') {
       e.preventDefault();
       const data = {
         title: titleInput.value,
+        author: authorInput ? authorInput.value : '',
         excerpt: excerptInput.value,
         imageUrl: imageInput ? imageInput.value : '',
         content: quill ? quill.root.innerHTML : (contentInput ? contentInput.value : ''),
@@ -390,6 +392,7 @@ if (page === 'blog.html') {
         const post = snap.docs.find(d => d.id === id).data();
         
         titleInput.value = post.title;
+        if(authorInput) authorInput.value = post.author || '';
         excerptInput.value = post.excerpt;
         if(imageInput) imageInput.value = post.imageUrl || '';
         if(contentInput) contentInput.value = post.content || '';
@@ -413,6 +416,9 @@ if (page === 'projects.html') {
   const form = document.getElementById('projectForm');
   const titleInput = document.getElementById('projectTitle');
   const avenueInput = document.getElementById('projectAvenue');
+  const chairInput = document.getElementById('projectChair');
+  const locationInput = document.getElementById('projectLocation');
+  const beneficiariesInput = document.getElementById('projectBeneficiaries');
   const dateInput = document.getElementById('projectDate');
   const imageInput = document.getElementById('projectImage');
   const descInput = document.getElementById('projectDescription');
@@ -467,6 +473,9 @@ if (page === 'projects.html') {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
+        chair: chairInput ? chairInput.value : '',
+        location: locationInput ? locationInput.value : '',
+        beneficiaries: beneficiariesInput ? beneficiariesInput.value : '',
         title: titleInput.value,
         avenue: avenueInput.value,
         date: dateInput.value || new Date().toISOString().split('T')[0],
@@ -513,6 +522,9 @@ if (page === 'projects.html') {
         titleInput.value = project.title;
         avenueInput.value = project.avenue;
         dateInput.value = project.date || '';
+        if(chairInput) chairInput.value = project.chair || '';
+        if(locationInput) locationInput.value = project.location || '';
+        if(beneficiariesInput) beneficiariesInput.value = project.beneficiaries || '';
         if(imageInput) imageInput.value = project.imageUrl || '';
         if(descInput) descInput.value = project.description || '';
         if(quill) quill.root.innerHTML = project.description || '';

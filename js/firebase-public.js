@@ -96,7 +96,6 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(stripHtml(p.description || p.avenue)).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-tag"></i>
@@ -107,7 +106,7 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
                   ${dateStr}
                 </span>
               </div>
-              <a href="/pages/project-details.html?id=${doc.id}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
+              <a href="/pages/project-details.html?id=${doc.id}" class="read-more-btn">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -162,14 +161,13 @@ if (page === 'blog.html') {
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(stripHtml(p.excerpt || p.content || '')).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-calendar"></i>
                   ${date}
                 </span>
               </div>
-              <a href="blog-details.html?id=${doc.id}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
+              <a href="blog-details.html?id=${doc.id}" class="read-more-btn">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -232,7 +230,6 @@ if (page === 'projects.html') {
                   </div>
                   <div class="project-content">
                     <h3>${escapeHtml(p.title)}</h3>
-                    <p>${escapeHtml(stripHtml(p.description || p.avenue)).substring(0, 100)}...</p>
                     <div class="project-stats">
                       <span class="project-stat">
                         <i class="fas fa-tag"></i>
@@ -243,7 +240,7 @@ if (page === 'projects.html') {
                         ${dateStr}
                       </span>
                     </div>
-                    <a href="project-details.html?id=${p.id || ''}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
+                    <a href="project-details.html?id=${p.id || ''}" class="read-more-btn">Read More &rarr;</a>
                   </div>
                 </div>
               `}).join('')}
@@ -392,13 +389,13 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(stripHtml(p.description || '')).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-calendar"></i>
                   ${dateStr}
                 </span>
               </div>
+              <a href="project-details.html?id=${p.id || ''}" class="read-more-btn">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -550,6 +547,8 @@ if (page === 'project-details.html') {
               <span><i class="fas fa-tag"></i> ${escapeHtml(p.avenue)}</span>
               <span><i class="fas fa-calendar"></i> ${dateStr}</span>
               ${p.chair ? `<span><i class="fas fa-user"></i> ${escapeHtml(p.chair)}</span>` : ''}
+              ${p.location ? `<span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.location)}</span>` : ''}
+              ${p.beneficiaries ? `<span><i class="fas fa-users"></i> ${escapeHtml(p.beneficiaries)}</span>` : ''}
             </div>
           </div>
           
