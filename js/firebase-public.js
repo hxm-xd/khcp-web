@@ -92,7 +92,7 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
         const html = `
           <div class="project-card" data-aos="fade-up">
             <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-hands-helping"></i>'}
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-hands-helping"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
@@ -157,7 +157,7 @@ if (page === 'blog.html') {
         const html = `
           <div class="project-card" data-aos="fade-up">
             <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-pen-nib"></i>'}
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-pen-nib"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
@@ -217,8 +217,8 @@ if (page === 'projects.html') {
         const projects = groups[key];
         
         const sectionHtml = `
-          <div class="month-section" style="margin-bottom: 40px;">
-            <h3 style="margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">${escapeHtml(key)}</h3>
+          <div class="month-section">
+            <h3 class="month-heading">${escapeHtml(key)}</h3>
             <div class="projects-grid">
               ${projects.map(p => {
                  const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
@@ -226,7 +226,7 @@ if (page === 'projects.html') {
                  return `
                 <div class="project-card" data-aos="fade-up">
                   <div class="project-image">
-                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
+                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-project-diagram"></i>'}
                   </div>
                   <div class="project-content">
                     <h3>${escapeHtml(p.title)}</h3>
@@ -331,7 +331,7 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             <ul class="director-list">
               ${list.map(d => `
                 <li class="director">
-                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; margin-right:10px;">` : ''}
+                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" class="director-img">` : ''}
                   <div>
                     <div class="director-name">${escapeHtml(d.name)}</div>
                     <div class="director-role">${escapeHtml(d.avenue)} Director</div>
@@ -385,7 +385,7 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         const html = `
           <div class="project-card" data-aos="fade-up">
             <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-project-diagram"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>

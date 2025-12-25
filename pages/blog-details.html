@@ -9,6 +9,7 @@
     />
     <title>Blog Post | Rotaract Club of Kandy Hill Capital</title>
     <link rel="stylesheet" href="../styles/styles.css" />
+    <link rel="stylesheet" href="../styles/details.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
@@ -20,111 +21,6 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
-    <style>
-      .detail-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 0 20px;
-      }
-      .detail-header {
-        margin-bottom: 2rem;
-        text-align: center;
-      }
-      .detail-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: var(--text-dark);
-        margin-bottom: 1rem;
-        line-height: 1.2;
-      }
-      .detail-meta {
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        color: var(--text-light);
-        font-size: 0.95rem;
-        margin-bottom: 2rem;
-        flex-wrap: wrap;
-      }
-      .detail-meta span {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      .detail-image {
-        width: 100%;
-        height: auto;
-        max-height: 500px;
-        object-fit: cover;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      }
-      .detail-content {
-        font-size: 1.1rem;
-        line-height: 1.8;
-        color: var(--text-dark);
-      }
-      .detail-content p {
-        margin-bottom: 1.5rem;
-      }
-      .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 50px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        margin-top: 2rem;
-      }
-      .back-btn:hover {
-        background-color: var(--secondary-color);
-        transform: translateY(-2px);
-      }
-      /* Loading State */
-      .skeleton {
-        background: #eee;
-        background: linear-gradient(
-          110deg,
-          #ececec 8%,
-          #f5f5f5 18%,
-          #ececec 33%
-        );
-        border-radius: 5px;
-        background-size: 200% 100%;
-        animation: 1.5s shine linear infinite;
-      }
-      @keyframes shine {
-        to {
-          background-position-x: -200%;
-        }
-      }
-      .skeleton-title {
-        height: 40px;
-        width: 70%;
-        margin: 0 auto 1rem;
-      }
-      .skeleton-meta {
-        height: 20px;
-        width: 40%;
-        margin: 0 auto 2rem;
-      }
-      .skeleton-image {
-        height: 400px;
-        width: 100%;
-        margin-bottom: 2rem;
-        border-radius: 12px;
-      }
-      .skeleton-text {
-        height: 20px;
-        width: 100%;
-        margin-bottom: 1rem;
-      }
-    </style>
   </head>
   <body>
     <div class="loading-screen">

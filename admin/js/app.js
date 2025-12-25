@@ -310,11 +310,18 @@ if (page === 'blog.html') {
   let quill = null;
 
   if (document.getElementById('postContentEditor')) {
+    if (window.Quill) {
+      var Size = window.Quill.import('attributors/style/size');
+      Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'];
+      window.Quill.register(Size, true);
+    }
+
     quill = new Quill('#postContentEditor', {
       theme: 'snow',
       modules: {
         toolbar: [
           [{ 'header': [1, 2, 3, false] }],
+          [{ 'size': ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'] }],
           ['bold', 'italic', 'underline', 'strike'],
           ['blockquote', 'code-block'],
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -428,11 +435,18 @@ if (page === 'projects.html') {
   let quill = null;
 
   if (document.getElementById('projectDescriptionEditor')) {
+    if (window.Quill) {
+      var Size = window.Quill.import('attributors/style/size');
+      Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'];
+      window.Quill.register(Size, true);
+    }
+
     quill = new Quill('#projectDescriptionEditor', {
       theme: 'snow',
       modules: {
         toolbar: [
           [{ 'header': [1, 2, 3, false] }],
+          [{ 'size': ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'] }],
           ['bold', 'italic', 'underline', 'strike'],
           ['blockquote', 'code-block'],
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
