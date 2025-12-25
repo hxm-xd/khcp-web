@@ -3,13 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Analytics KHCP Admin</title>
+    <title>Messages KHCP Admin</title>
     <link rel="stylesheet" href="/admin/css/styles.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="/admin/js/app.js"></script>
   </head>
   <body>
@@ -37,10 +36,10 @@
           <a href="projects.html" class="nav-link">
             <i class="fas fa-project-diagram"></i> Projects
           </a>
-          <a href="messages.html" class="nav-link">
+          <a href="messages.html" class="nav-link active">
             <i class="fas fa-envelope"></i> Messages
           </a>
-          <a href="analytics.html" class="nav-link active">
+          <a href="analytics.html" class="nav-link">
             <i class="fas fa-chart-line"></i> Analytics
           </a>
           <a href="profile.html" class="nav-link">
@@ -61,26 +60,50 @@
             <button class="mobile-toggle" id="sidebarToggle">
               <i class="fas fa-bars"></i>
             </button>
-            <h1 class="page-title">Analytics</h1>
+            <h1 class="page-title">Messages</h1>
           </div>
         </header>
 
         <div class="content-wrapper">
           <div class="section-card">
             <div class="section-header">
-              <h3 class="section-title">Data Overview</h3>
+              <h3 class="section-title">Inbox</h3>
             </div>
-            <div class="charts grid-responsive">
-              <div class="chart-container">
-                <canvas id="countsChart"></canvas>
-              </div>
-              <div class="chart-container">
-                <canvas id="distributionChart"></canvas>
-              </div>
+            <div id="messagesList" class="list-container">
+              <!-- Messages loaded here -->
+              <p class="text-muted">Loading messages...</p>
             </div>
           </div>
         </div>
       </main>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3 class="modal-title">Message Details</h3>
+          <button class="modal-close" id="closeModalBtn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="message-meta">
+            <p><strong>From:</strong> <span id="modalSender"></span></p>
+            <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+            <p><strong>Date:</strong> <span id="modalDate"></span></p>
+          </div>
+          <div class="message-content">
+            <p id="modalMessage"></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="closeModalFooterBtn">
+            Close
+          </button>
+          <button class="btn btn-danger" id="deleteMessageBtn">
+            Delete Message
+          </button>
+        </div>
+      </div>
     </div>
   </body>
 </html>

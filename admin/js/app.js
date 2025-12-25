@@ -921,3 +921,124 @@ try {
     });
   }
 } catch (e) { console.error("Sidebar toggle error", e); }
+// --- Messages Logic ---
+
+let currentMessageId = null;
+
+function openMessageModal(docSnapshot) {
+  const data = docSnapshot.data();
+  const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'No Date';
+  
+  document.getElementById('modalSender').textContent = data.name || 'Unknown';
+  document.getElementById('modalEmail').textContent = data.email || 'No Email';
+  document.getElementById('modalDate').textContent = date;
+  document.getElementById('modalMessage').textContent = data.message || '';
+  
+  currentMessageId = docSnapshot.id;
+  
+  const modal = document.getElementById('messageModal');
+  if (modal) modal.classList.add('show');
+}
+
+function closeMessageModal() {
+  const modal = document.getElementById('messageModal');
+  if (modal) modal.classList.remove('show');
+  currentMessageId = null;
+}
+
+async function deleteCurrentMessage() {
+  if (!currentMessageId) return;
+  
+  if(confirm('Are you sure you want to delete this message?')) {
+    try {
+      await deleteDoc(doc(db, "messages", currentMessageId));
+      showToast('Message deleted');
+      closeMessageModal();
+      loadMessages(); // Reload list
+    } catch (error) {
+      console.error("Error deleting message: ", error);
+      showToast('Error deleting message', 'error');
+    }
+  }
+}
+
+async function loadMessages() {
+  const list = document.getElementById('messagesList');
+  if (!list) return;
+
+  // Setup modal listeners once
+  if (!window.modalListenersAttached) {
+    const closeBtn = document.getElementById('closeModalBtn');
+    const closeFooterBtn = document.getElementById('closeModalFooterBtn');
+    const deleteBtn = document.getElementById('deleteMessageBtn');
+    const modal = document.getElementById('messageModal');
+    
+    if (closeBtn) closeBtn.addEventListener('click', closeMessageModal);
+    if (closeFooterBtn) closeFooterBtn.addEventListener('click', closeMessageModal);
+    if (deleteBtn) deleteBtn.addEventListener('click', deleteCurrentMessage);
+    
+    // Close on click outside
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeMessageModal();
+        });
+    }
+    
+    window.modalListenersAttached = true;
+  }
+
+  list.innerHTML = '<p class="text-muted">Loading messages...</p>';
+
+  try {
+    const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
+    
+    list.innerHTML = '';
+    
+    if (querySnapshot.empty) {
+      list.innerHTML = '<p class="text-muted">No messages found.</p>';
+      return;
+    }
+
+    querySnapshot.forEach((docSnapshot) => {
+      const data = docSnapshot.data();
+      const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'No Date';
+      const preview = data.message ? (data.message.substring(0, 100) + (data.message.length > 100 ? '...' : '')) : '';
+      
+      const item = document.createElement('div');
+      item.className = 'list-item';
+      item.style.cursor = 'pointer';
+      item.innerHTML = `
+        <div class="item-content">
+          <div class="item-header">
+            <h4 class="item-title">${data.name || 'Unknown'} <span style="font-weight:normal; font-size: 0.9em; color: #666;">(${data.email || 'No Email'})</span></h4>
+            <span class="item-date">${date}</span>
+          </div>
+          <p class="item-subtitle" style="margin-top: 0.5rem; color: #666;">${preview}</p>
+        </div>
+        <div class="item-actions">
+           <button class="btn-icon view-btn" title="View">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      `;
+      
+      item.addEventListener('click', () => openMessageModal(docSnapshot));
+
+      list.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Error loading messages: ", error);
+    list.innerHTML = '<p class="error-text">Error loading messages.</p>';
+  }
+}
+
+if (page === 'messages.html') {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      loadMessages();
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
+}

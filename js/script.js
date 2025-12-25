@@ -105,10 +105,12 @@ if (contactForm) {
     
     // Add real-time validation feedback
     formInputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearValidation);
+        input.addEventListener('blur', (e) => validateField(e.target));
+        input.addEventListener('input', (e) => clearValidation(e.target));
     });
     
+    /* 
+    // Disabled to allow Firebase handling in firebase-public.js
     contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -146,6 +148,7 @@ if (contactForm) {
             submitBtn.classList.remove('loading');
         }, 2000);
     });
+    */
 }
 
 // Enhanced field validation

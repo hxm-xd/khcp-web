@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, where, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, where, limit, doc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR97VU9ug7TVOLpzY1Tz1NkOjbrzrfQWk",
@@ -632,3 +632,59 @@ if (page === 'blog-details.html') {
 }
 
 loadNavbarAvenues();
+
+// 8. Contact Form Handling
+const contactForm = document.querySelector('.contact-form form');
+if (contactForm) {
+  console.log("Contact form found, attaching listener");
+  contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log("Form submitted");
+    
+    const nameInput = this.querySelector('input[type="text"]');
+    const emailInput = this.querySelector('input[type="email"]');
+    const messageInput = this.querySelector('textarea');
+    const submitBtn = this.querySelector('button[type="submit"]');
+    
+    if (!nameInput || !emailInput || !messageInput) {
+        console.error("Form inputs not found");
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const message = messageInput.value.trim();
+    
+    if (!name || !email || !message) {
+      if (window.showNotification) window.showNotification('Please fill in all fields.', 'error');
+      else alert('Please fill in all fields.');
+      return;
+    }
+    
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+      await addDoc(collection(db, 'messages'), {
+        name,
+        email,
+        message,
+        timestamp: new Date(),
+        read: false
+      });
+      
+      if (window.showNotification) window.showNotification('Message sent successfully!', 'success');
+      else alert('Message sent successfully!');
+      
+      this.reset();
+    } catch (e) {
+      console.error('Error sending message', e);
+      if (window.showNotification) window.showNotification('Error sending message. Please try again.', 'error');
+      else alert('Error sending message. Please try again.');
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+}
