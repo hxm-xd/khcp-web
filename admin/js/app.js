@@ -225,7 +225,10 @@ if (page === 'dashboard.html') {
       try {
         const snap = await getDocs(collection(db, colName));
         const el = document.getElementById(`count${colName.charAt(0).toUpperCase() + colName.slice(1)}`);
-        if (el) el.textContent = snap.size;
+        if (el) {
+          el.textContent = snap.size;
+          el.classList.remove('skeleton', 'skeleton-h3');
+        }
       } catch (e) {
         console.error(`Error loading count for ${colName}`, e);
       }
@@ -262,6 +265,11 @@ if (page === 'dashboard.html') {
       }
     } catch (e) {
       console.error("Error loading stats", e);
+    } finally {
+      if (statMembers) statMembers.classList.remove('skeleton');
+      if (statProjects) statProjects.classList.remove('skeleton');
+      if (statYears) statYears.classList.remove('skeleton');
+      if (statHours) statHours.classList.remove('skeleton');
     }
   }
 
@@ -796,6 +804,13 @@ if (page === 'profile.html') {
     } catch (e) {
       console.error("Error loading settings", e);
       showToast("Error loading settings", "error");
+    } finally {
+      if (nameInput) nameInput.classList.remove('skeleton');
+      if (emailInput) emailInput.classList.remove('skeleton');
+      if (statMembers) statMembers.classList.remove('skeleton');
+      if (statProjects) statProjects.classList.remove('skeleton');
+      if (statYears) statYears.classList.remove('skeleton');
+      if (statHours) statHours.classList.remove('skeleton');
     }
   }
 
