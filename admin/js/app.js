@@ -65,31 +65,7 @@ function escapeHtml(text) {
 }
 
 async function seedAvenues() {
-  try {
-    const snap = await getDocs(collection(db, 'avenues'));
-    const existingNames = snap.docs.map(d => d.data().name);
-    
-    const defaults = [
-      { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
-      { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
-      { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
-      { name: 'International Service', link: 'avenue.html?name=International%20Service' },
-      { name: 'Sports and Recreational Activities', link: 'avenue.html?name=Sports%20and%20Recreational%20Activities' },
-      { name: 'Membership Development', link: 'avenue.html?name=Membership%20Development' }
-    ];
-
-    let added = false;
-    for (const a of defaults) {
-      if (!existingNames.includes(a.name)) {
-        await addDoc(collection(db, 'avenues'), a);
-        added = true;
-      }
-    }
-    return added;
-  } catch (e) {
-    console.error("Error seeding avenues", e);
-    return false;
-  }
+  return false; // Disabled seeding
 }
 
 function renderList(container, items, renderContentFn, allowDelete = true) {

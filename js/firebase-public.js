@@ -484,27 +484,23 @@ async function loadNavbarAvenues() {
   if (!dropdown) return;
 
   try {
-    const snap = await getDocs(collection(db, 'avenues'));
+    // const snap = await getDocs(collection(db, 'avenues'));
     let avenues = [];
     
-    if (!snap.empty) {
-      avenues = snap.docs.map(d => d.data());
-    }
+    // if (!snap.empty) {
+    //   avenues = snap.docs.map(d => d.data());
+    // }
 
-    // Ensure default avenues are present if DB is empty or missing them
+    // Use static pages only
     const defaults = [
-      { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
-      { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
-      { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
-      { name: 'International Service', link: 'avenue.html?name=International%20Service' }
+      { name: 'Community Service', link: 'avenues/community-service.html' },
+      { name: 'Club Service', link: 'avenues/club-service.html' },
+      { name: 'Professional Development', link: 'avenues/professional-development.html' },
+      { name: 'International Service', link: 'avenues/international-service.html' }
     ];
 
-    defaults.forEach(def => {
-      if (!avenues.find(a => a.name === def.name)) {
-        avenues.push(def);
-      }
-    });
-    
+    avenues = defaults;
+
     // Sort avenues to ensure consistent order
     // Order: Club, Community, International, Professional
     const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
@@ -675,25 +671,21 @@ if (page === 'avenues.html' && !path.includes('/admin/')) {
     if (!container) return;
 
     try {
-      const snap = await getDocs(collection(db, 'avenues'));
+      // const snap = await getDocs(collection(db, 'avenues'));
       let avenues = [];
-      if (!snap.empty) {
-        avenues = snap.docs.map(d => d.data());
-      }
+      // if (!snap.empty) {
+      //   avenues = snap.docs.map(d => d.data());
+      // }
 
-      // Ensure default avenues are present if DB is empty or missing them
+      // Use static pages only
       const defaults = [
-        { name: 'Community Service', link: 'avenue.html?name=Community%20Service', description: 'Addressing the needs of the local community through impactful projects and initiatives.', icon: 'fa-hands-helping' },
-        { name: 'Club Service', link: 'avenue.html?name=Club%20Service', description: 'Fostering fellowship among members and strengthening the functioning of the club.', icon: 'fa-users' },
-        { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fa-briefcase' },
-        { name: 'International Service', link: 'avenue.html?name=International%20Service', description: 'Promoting international understanding and goodwill through global projects and partnerships.', icon: 'fa-globe' }
+        { name: 'Community Service', link: 'avenues/community-service.html', description: 'Addressing the needs of the local community through impactful projects and initiatives.', icon: 'fa-hands-helping' },
+        { name: 'Club Service', link: 'avenues/club-service.html', description: 'Fostering fellowship among members and strengthening the functioning of the club.', icon: 'fa-users' },
+        { name: 'Professional Development', link: 'avenues/professional-development.html', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fa-briefcase' },
+        { name: 'International Service', link: 'avenues/international-service.html', description: 'Promoting international understanding and goodwill through global projects and partnerships.', icon: 'fa-globe' }
       ];
 
-      defaults.forEach(def => {
-        if (!avenues.find(a => a.name === def.name)) {
-          avenues.push(def);
-        }
-      });
+      avenues = defaults;
 
       // Sort avenues
       const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
