@@ -45,12 +45,12 @@
 }
 
 .detail-image {
-    width: 100%;
+    display: block;
+    width: 600px;
+    max-width: 100%;
     height: auto;
-    max-height: 500px;
-    object-fit: cover;
     border-radius: 12px;
-    margin-bottom: 2rem;
+    margin: 0 auto 2rem auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
