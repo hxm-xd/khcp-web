@@ -533,3 +533,32 @@ input:focus, select:focus, textarea:focus {
     margin-top: 0.75rem;
 }
 
+
+/* Admin Add Button */
+.btn-add {
+    background: linear-gradient(135deg, #D22163 0%, #b01850 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(210, 33, 99, 0.25);
+}
+
+.btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(210, 33, 99, 0.35);
+    background: linear-gradient(135deg, #e0286d 0%, #c41b5a 100%);
+}
+
+.btn-add:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(210, 33, 99, 0.2);
+}
+

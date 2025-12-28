@@ -16,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const path = window.location.pathname;
-const page = path.split('/').pop();
+const page = path.split('/').pop().split('?')[0]; // Handle query params
 
 // Helper to escape HTML
 function escapeHtml(text) {
@@ -39,39 +39,6 @@ function stripHtml(html) {
   // Retrieve the text content
   return tmp.textContent || tmp.innerText || "";
 }
-
-// Global: Load Avenues Dropdown
-async function loadAvenuesDropdown() {
-  const dropdown = document.querySelector('.has-dropdown .dropdown');
-  if (!dropdown) return;
-
-  try {
-    const q = query(collection(db, 'avenues'), orderBy('name'));
-    const snap = await getDocs(q);
-
-    if (snap.empty) return;
-
-    dropdown.innerHTML = '';
-    snap.forEach(doc => {
-      const data = doc.data();
-      const li = document.createElement('li');
-      
-      let linkPrefix = 'pages/';
-      if (window.location.pathname.includes('/pages/')) {
-          linkPrefix = '';
-      }
-      
-      const a = document.createElement('a');
-      a.href = `${linkPrefix}avenue.html?name=${encodeURIComponent(data.name)}`;
-      a.textContent = data.name;
-      li.appendChild(a);
-      dropdown.appendChild(li);
-    });
-  } catch (e) {
-    console.error("Error loading avenues dropdown", e);
-  }
-}
-loadAvenuesDropdown();
 
 // 1. Home Page & About Page Stats
 if (page === 'index.html' || page === '' || page === 'about.html') {
@@ -599,6 +566,18 @@ if (page === 'avenues.html') {
     const container = document.querySelector('.avenues-grid');
     if (!container) return;
 
+    // Add Skeleton Loading
+    container.innerHTML = '';
+    for(let i=0; i<4; i++) {
+        container.innerHTML += `
+        <div class="avenue-item skeleton-item" style="height: 250px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div class="skeleton skeleton-block" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 1.2rem;"></div>
+            <div class="skeleton skeleton-title" style="width: 60%; height: 1.5rem; margin-bottom: 0.7rem;"></div>
+            <div class="skeleton skeleton-text" style="width: 80%;"></div>
+            <div class="skeleton skeleton-text" style="width: 60%;"></div>
+        </div>`;
+    }
+
     try {
       const snap = await getDocs(collection(db, 'avenues'));
       let avenues = [];
@@ -769,3 +748,4 @@ if (page === 'blog-details.html') {
 }
 
 loadNavbarAvenues();
+document.addEventListener('DOMContentLoaded', loadNavbarAvenues);
