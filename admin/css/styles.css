@@ -77,7 +77,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-header .brand img {
-    transform: scale(3.5);
+    height: 40px;
+    width: auto;
 }
 
 .sidebar-nav {
@@ -978,6 +979,5 @@ input:focus, select:focus, textarea:focus {
     100% {
         background-position: -200% 0;
     }
->>>>>>> main
 }
 

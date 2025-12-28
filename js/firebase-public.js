@@ -41,6 +41,22 @@ function stripHtml(html) {
   return tmp.textContent || tmp.innerText || "";
 }
 
+// Toast Notification Helper
+window.showNotification = function(message, type = 'success') {
+  let toast = document.querySelector('.toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.className = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.className = `toast ${type} show`;
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+};
+
 // 1. Home Page & About Page Stats
 if (page === 'index.html' || page === '' || page === 'about.html') {
   async function loadStats() {
@@ -62,6 +78,7 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
       }
     } catch (e) {
       console.error("Error loading stats", e);
+      // Optional: showNotification("Failed to load stats", "error");
     }
   }
   loadStats();
