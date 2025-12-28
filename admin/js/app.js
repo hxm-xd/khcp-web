@@ -553,11 +553,25 @@ if (page === 'avenues.html') {
       renderList(list, avenues, (a) => `
         <h4>${escapeHtml(a.name)}</h4>
         <div class="meta">${escapeHtml(a.description || '')}</div>
-      `, false); 
+      `, true); 
     } catch (e) {
       console.error("Error loading avenues", e);
       showToast("Error loading avenues", "error");
     }
+  }
+
+  const addBtn = document.getElementById('addAvenueBtn');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      editId = resetForm(form, submitBtn, 'Add Avenue');
+      form.style.display = 'block';
+      form.scrollIntoView({ behavior: 'smooth' });
+      if (nameInput) {
+          nameInput.readOnly = false;
+          nameInput.classList.remove('input-readonly');
+          nameInput.value = '';
+      }
+    });
   }
 
   if (form) {
@@ -568,10 +582,9 @@ if (page === 'avenues.html') {
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!editId) return; // Only allow updates
-
+      
       const data = { 
-        // name: nameInput.value, // Name is read-only/fixed
+        name: nameInput.value,
         imageUrl: imageInput ? imageInput.value : '',
         description: descInput ? descInput.value : '',
         stat1Label: stat1Label ? stat1Label.value : '',
@@ -581,10 +594,15 @@ if (page === 'avenues.html') {
       };
 
       try {
-        await updateDoc(doc(db, 'avenues', editId), data);
-        showToast("Avenue updated");
+        if (editId) {
+            await updateDoc(doc(db, 'avenues', editId), data);
+            showToast("Avenue updated");
+        } else {
+            await addDoc(collection(db, 'avenues'), data);
+            showToast("Avenue added");
+        }
         
-        editId = resetForm(form, submitBtn, 'Update Avenue');
+        editId = resetForm(form, submitBtn, 'Add Avenue');
         form.style.display = 'none';
         loadAvenues();
       } catch (err) {
@@ -601,7 +619,13 @@ if (page === 'avenues.html') {
       const id = btn.dataset.id;
       const action = btn.dataset.action;
 
-      if (action === 'edit') {
+      if (action === 'delete') {
+        if (confirm('Delete this avenue?')) {
+          await deleteDoc(doc(db, 'avenues', id));
+          showToast("Avenue deleted");
+          loadAvenues();
+        }
+      } else if (action === 'edit') {
         const snap = await getDocs(collection(db, 'avenues'));
         const avenue = snap.docs.find(d => d.id === id).data();
         nameInput.value = avenue.name;

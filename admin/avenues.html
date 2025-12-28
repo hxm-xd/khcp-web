@@ -62,10 +62,21 @@
         </header>
 
         <div class="content-wrapper">
-          <p class="text-muted mb-5">
-            Select an avenue below to edit its details. New avenues cannot be
-            added.
-          </p>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 2rem;
+            "
+          >
+            <p class="text-muted" style="margin-bottom: 0">
+              Select an avenue below to edit its details or create a new one.
+            </p>
+            <button id="addAvenueBtn" class="btn-add">
+              <i class="fas fa-plus"></i> Add Avenue
+            </button>
+          </div>
 
           <form id="avenueForm" class="section-card form-stack hidden">
             <div class="section-header">
@@ -78,8 +89,6 @@
                   id="avenueName"
                   placeholder="e.g. Community Service"
                   required
-                  readonly
-                  class="input-readonly"
                 />
               </div>
               <div class="form-group">

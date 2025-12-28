@@ -99,27 +99,39 @@
       </div>
     </nav>
 
-    <section class="about" style="padding-top: 120px">
-      <div class="container">
-        <div class="section-title">
-          <h2>Avenue Name</h2>
-        </div>
+    <!-- Hero Section -->
+    <div class="avenue-hero" id="avenueHero">
+      <div class="avenue-hero-content">
+        <h1 id="avenueTitle" class="skeleton skeleton-title"></h1>
+      </div>
+    </div>
 
+    <section class="about" style="padding-top: 60px">
+      <div class="container">
         <div class="avenue-details" data-aos="fade-up">
-          <p
-            id="avenueDescription"
-            style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem"
-          >
-            Loading description...
-          </p>
+          <div id="avenueDescription">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text" style="width: 80%"></div>
+          </div>
 
           <div class="about-stats">
             <div class="stat-item">
-              <div class="stat-number" id="stat1Value">-</div>
+              <div class="stat-number" id="stat1Value">
+                <div
+                  class="skeleton skeleton-text"
+                  style="width: 50px; display: inline-block"
+                ></div>
+              </div>
               <div class="stat-label" id="stat1Label">Projects</div>
             </div>
             <div class="stat-item">
-              <div class="stat-number" id="stat2Value">-</div>
+              <div class="stat-number" id="stat2Value">
+                <div
+                  class="skeleton skeleton-text"
+                  style="width: 50px; display: inline-block"
+                ></div>
+              </div>
               <div class="stat-label" id="stat2Label">Volunteers</div>
             </div>
           </div>
@@ -133,7 +145,10 @@
           <h3 style="margin-bottom: 1.5rem">Directors</h3>
           <div class="director-grid">
             <!-- Directors loaded here -->
-            <p>Loading directors...</p>
+            <div
+              class="skeleton skeleton-block"
+              style="height: 100px; width: 200px"
+            ></div>
           </div>
         </div>
 
@@ -145,7 +160,9 @@
           <h3 style="margin-bottom: 1.5rem">Recent Projects</h3>
           <div class="projects-grid" id="avenueProjectsGrid">
             <!-- Projects loaded here -->
-            <p>Loading projects...</p>
+            <div class="skeleton skeleton-block"></div>
+            <div class="skeleton skeleton-block"></div>
+            <div class="skeleton skeleton-block"></div>
           </div>
         </div>
       </div>

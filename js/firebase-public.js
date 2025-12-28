@@ -40,6 +40,39 @@ function stripHtml(html) {
   return tmp.textContent || tmp.innerText || "";
 }
 
+// Global: Load Avenues Dropdown
+async function loadAvenuesDropdown() {
+  const dropdown = document.querySelector('.has-dropdown .dropdown');
+  if (!dropdown) return;
+
+  try {
+    const q = query(collection(db, 'avenues'), orderBy('name'));
+    const snap = await getDocs(q);
+
+    if (snap.empty) return;
+
+    dropdown.innerHTML = '';
+    snap.forEach(doc => {
+      const data = doc.data();
+      const li = document.createElement('li');
+      
+      let linkPrefix = 'pages/';
+      if (window.location.pathname.includes('/pages/')) {
+          linkPrefix = '';
+      }
+      
+      const a = document.createElement('a');
+      a.href = `${linkPrefix}avenue.html?name=${encodeURIComponent(data.name)}`;
+      a.textContent = data.name;
+      li.appendChild(a);
+      dropdown.appendChild(li);
+    });
+  } catch (e) {
+    console.error("Error loading avenues dropdown", e);
+  }
+}
+loadAvenuesDropdown();
+
 // 1. Home Page & About Page Stats
 if (page === 'index.html' || page === '' || page === 'about.html') {
   async function loadStats() {
@@ -431,10 +464,13 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     if (!avenueName) return;
 
     // Update Title
-    const titleEl = document.querySelector('.section-title h2');
+    const titleEl = document.getElementById('avenueTitle');
     if (titleEl) {
         titleEl.textContent = avenueName;
+        titleEl.classList.remove('skeleton', 'skeleton-title');
     }
+    
+    // Update Breadcrumb if exists
     const breadcrumbEl = document.querySelector('.breadcrumb-item.active');
     if (breadcrumbEl) {
         breadcrumbEl.textContent = avenueName;
@@ -447,10 +483,20 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
       if (!snap.empty) {
         const data = snap.docs[0].data();
         
+        // Update Hero Image
+        const heroEl = document.getElementById('avenueHero');
+        if (heroEl && data.imageUrl) {
+            heroEl.style.backgroundImage = `url('${escapeHtml(data.imageUrl)}')`;
+        } else if (heroEl) {
+            // Default gradient or fallback image if needed
+            heroEl.style.background = 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)';
+        }
+
         // Update Description
         const descEl = document.getElementById('avenueDescription');
         if (descEl && data.description) {
           descEl.textContent = data.description;
+          // Remove skeleton children if any (by replacing content)
         }
 
         // Update Stats
@@ -460,9 +506,14 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         const s2Value = document.getElementById('stat2Value');
 
         if (s1Label && data.stat1Label) s1Label.textContent = data.stat1Label;
-        if (s1Value && data.stat1Value) s1Value.textContent = data.stat1Value;
+        if (s1Value && data.stat1Value) {
+            s1Value.textContent = data.stat1Value;
+            // Remove skeleton class if applied to parent or self
+        }
         if (s2Label && data.stat2Label) s2Label.textContent = data.stat2Label;
-        if (s2Value && data.stat2Value) s2Value.textContent = data.stat2Value;
+        if (s2Value && data.stat2Value) {
+            s2Value.textContent = data.stat2Value;
+        }
       }
     } catch (e) {
       console.error("Error loading avenue details", e);
