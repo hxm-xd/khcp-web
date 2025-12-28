@@ -82,11 +82,37 @@ function renderSkeleton(container, count = 3) {
   }
 }
 
+let isSeeding = false;
+
 async function seedAvenues() {
+  if (isSeeding) return false;
+  isSeeding = true;
+  
   try {
     const snap = await getDocs(collection(db, 'avenues'));
-    const existingNames = snap.docs.map(d => (d.data().name || '').trim().toLowerCase());
+    const docs = snap.docs;
     
+    // 1. Identify and remove duplicates
+    const seen = new Set();
+    const duplicates = [];
+    
+    docs.forEach(d => {
+      const name = (d.data().name || '').trim().toLowerCase();
+      if (name) {
+        if (seen.has(name)) {
+          duplicates.push(d.id);
+        } else {
+          seen.add(name);
+        }
+      }
+    });
+
+    if (duplicates.length > 0) {
+      console.log(`Found ${duplicates.length} duplicate avenues. Removing...`);
+      await Promise.all(duplicates.map(id => deleteDoc(doc(db, 'avenues', id))));
+    }
+
+    // 2. Add missing defaults
     const defaults = [
       { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
       { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
@@ -96,15 +122,17 @@ async function seedAvenues() {
 
     let added = false;
     for (const a of defaults) {
-      if (!existingNames.includes(a.name.toLowerCase())) {
+      if (!seen.has(a.name.toLowerCase())) {
         await addDoc(collection(db, 'avenues'), a);
         added = true;
       }
     }
-    return added;
+    return added || duplicates.length > 0;
   } catch (e) {
     console.error("Error seeding avenues", e);
     return false;
+  } finally {
+    isSeeding = false;
   }
 }
 
