@@ -64,6 +64,24 @@ function escapeHtml(text) {
     .replace(/'/g, "&#039;");
 }
 
+function renderSkeleton(container, count = 3) {
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'list-item skeleton-item';
+    el.innerHTML = `
+      <div class="item-content" style="width: 100%; display: flex; align-items: center;">
+        <div class="skeleton skeleton-block" style="width: 60px; height: 60px; margin-right: 1rem; border-radius: 8px;"></div>
+        <div class="item-details" style="flex: 1;">
+          <div class="skeleton skeleton-text" style="width: 40%; height: 1.2rem; margin-bottom: 0.5rem;"></div>
+          <div class="skeleton skeleton-text" style="width: 70%; height: 1rem;"></div>
+        </div>
+      </div>
+    `;
+    container.appendChild(el);
+  }
+}
+
 async function seedAvenues() {
   try {
     const snap = await getDocs(collection(db, 'avenues'));
@@ -326,6 +344,7 @@ if (page === 'blog.html') {
   }
 
   async function loadPosts() {
+    renderSkeleton(list);
     try {
       const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
       const snap = await getDocs(q);
@@ -441,6 +460,7 @@ if (page === 'projects.html') {
   populateAvenueSelect('projectAvenue');
 
   async function loadProjects() {
+    renderSkeleton(list);
     try {
       const snap = await getDocs(collection(db, 'projects'));
       const projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -546,6 +566,7 @@ if (page === 'avenues.html') {
   const stat2Value = document.getElementById('stat2Value');
 
   async function loadAvenues() {
+    renderSkeleton(list);
     try {
       const snap = await getDocs(collection(db, 'avenues'));
       const avenues = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -673,6 +694,7 @@ if (page === 'directors.html') {
   populateAvenueSelect('filterAvenue');
 
   async function loadDirectors() {
+    renderSkeleton(list);
     try {
       const snap = await getDocs(collection(db, 'directors'));
       let directors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
