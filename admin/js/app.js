@@ -1018,7 +1018,8 @@ async function loadMessages() {
     querySnapshot.forEach((docSnapshot) => {
       const data = docSnapshot.data();
       const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'No Date';
-      const preview = data.message ? (data.message.substring(0, 100) + (data.message.length > 100 ? '...' : '')) : '';
+      const rawPreview = data.message ? (data.message.substring(0, 100) + (data.message.length > 100 ? '...' : '')) : '';
+      const preview = escapeHtml(rawPreview);
       
       const item = document.createElement('div');
       item.className = 'list-item';

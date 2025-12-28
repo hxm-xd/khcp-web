@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, query, orderBy, where, limit, doc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import DOMPurify from "https://cdn.jsdelivr.net/npm/dompurify@3.0.6/+esm";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR97VU9ug7TVOLpzY1Tz1NkOjbrzrfQWk",
@@ -558,8 +559,8 @@ if (page === 'project-details.html') {
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
-            ${p.description ? `<div class="rich-text">${p.description}</div>` : ''}
-            ${p.content ? `<div class="rich-text">${p.content}</div>` : ''} 
+            ${p.description ? `<div class="rich-text">${DOMPurify.sanitize(p.description)}</div>` : ''}
+            ${p.content ? `<div class="rich-text">${DOMPurify.sanitize(p.content)}</div>` : ''} 
           </div>
 
           <div style="text-align: center; margin-top: 3rem;">
@@ -613,7 +614,7 @@ if (page === 'blog-details.html') {
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
-            ${p.content ? `<div class="rich-text">${p.content}</div>` : `<p>${escapeHtml(p.excerpt || '')}</p>`}
+            ${p.content ? `<div class="rich-text">${DOMPurify.sanitize(p.content)}</div>` : `<p>${escapeHtml(p.excerpt || '')}</p>`}
           </div>
 
           <div style="text-align: center; margin-top: 3rem;">
