@@ -147,6 +147,8 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
           seeMoreBtn.style.display = 'none';
         }
       }
+      
+      if (window.AOS) window.AOS.refresh();
 
     } catch (e) {
       console.error("Error loading home projects", e);
@@ -199,6 +201,8 @@ if (page === 'blog.html') {
         `;
         container.insertAdjacentHTML('beforeend', html);
       });
+      
+      if (window.AOS) window.AOS.refresh();
     } catch (e) {
       console.error("Error loading blog", e);
     }
@@ -275,6 +279,8 @@ if (page === 'projects.html') {
         `;
         container.insertAdjacentHTML('beforeend', sectionHtml);
       });
+      
+      if (window.AOS) window.AOS.refresh();
 
     } catch (e) {
       console.error("Error loading projects", e);
@@ -374,6 +380,8 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         `;
         container.insertAdjacentHTML('beforeend', html);
       });
+      
+      if (window.AOS) window.AOS.refresh();
 
     } catch (e) {
       console.error("Error loading directors", e);
@@ -437,6 +445,8 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         `;
         container.insertAdjacentHTML('beforeend', html);
       });
+      
+      if (window.AOS) window.AOS.refresh();
 
     } catch (e) {
       console.error("Error loading avenue projects", e);
@@ -549,7 +559,6 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     } catch (e) {
       console.error("Error loading avenue details", e);
       if (resolveAppReady) resolveAppReady();
-    }
     }
   }
   loadAvenueDetails();
