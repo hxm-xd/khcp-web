@@ -4,4 +4,4 @@ User-agent: *
 Allow: /
 
 # Sitemap location (absolute URL)
-Sitemap: https://rackhcp.vercel.app/sitemap.xml
+Sitemap: https://www.rackhcp.org/sitemap.xml

@@ -11,19 +11,52 @@
 
   let ctx, width = 0, height = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
   let particles = [];
-  const NUM_PARTICLES_BASE = 60; // scaled with area
+  
+  // Optimization: Detect mobile
+  const isMobile = window.innerWidth < 768;
+  const NUM_PARTICLES_BASE = isMobile ? 20 : 60; 
+  
   const COLORS = [
     'rgba(210,33,99,0.35)',
     'rgba(255,107,213,0.28)',
     'rgba(255,255,255,0.10)'
   ];
 
+  // Pre-render sprites for performance
+  const sprites = {};
+  
+  function createSprites() {
+    const size = 200; // Max size for sprite
+    const half = size / 2;
+    
+    COLORS.forEach(color => {
+        const c = document.createElement('canvas');
+        c.width = size;
+        c.height = size;
+        const x = c.getContext('2d');
+        
+        const g = x.createRadialGradient(half, half, 0, half, half, half);
+        g.addColorStop(0, color);
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        
+        x.fillStyle = g;
+        x.beginPath();
+        x.arc(half, half, half, 0, Math.PI * 2);
+        x.fill();
+        
+        sprites[color] = c;
+    });
+  }
+
   function boot(){
-    ctx = canvas.getContext('2d');
+    createSprites();
+    ctx = canvas.getContext('2d', { alpha: true }); // Optimize for alpha
     window.addEventListener('resize', debounce(resize, 150));
     resize();
     rafId = requestAnimationFrame(step);
   }
+
+  let bgGradient = null;
 
   function resize(){
     const rect = canvas.getBoundingClientRect();
@@ -32,12 +65,20 @@
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    
+    // Cache background gradient
+    bgGradient = ctx.createLinearGradient(0,0,width,height);
+    bgGradient.addColorStop(0, 'rgba(255,255,255,0.02)');
+    bgGradient.addColorStop(1, 'rgba(255,255,255,0.00)');
+    
     initParticles();
   }
 
   function initParticles(){
     const area = width * height;
-    const target = Math.max(20, Math.min(120, Math.floor(area / 16000)));
+    // Reduce density on mobile
+    const divisor = isMobile ? 25000 : 16000;
+    const target = Math.max(10, Math.min(120, Math.floor(area / divisor)));
     const count = Math.min(target, NUM_PARTICLES_BASE);
     particles = new Array(count).fill(0).map(() => makeParticle());
   }
@@ -60,21 +101,23 @@
   function step(){
     ctx.clearRect(0,0,width,height);
 
-    // subtle vignette
-    const gradBg = ctx.createLinearGradient(0,0,width,height);
-    gradBg.addColorStop(0, 'rgba(255,255,255,0.02)');
-    gradBg.addColorStop(1, 'rgba(255,255,255,0.00)');
-    ctx.fillStyle = gradBg;
-    ctx.fillRect(0,0,width,height);
+    // Use cached gradient
+    if (bgGradient) {
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0,0,width,height);
+    }
 
-    ctx.globalCompositeOperation = 'lighter';
+    // Only use lighter composite on desktop for performance
+    if (!isMobile) {
+        ctx.globalCompositeOperation = 'lighter';
+    }
 
     for (let p of particles){
       p.x += p.vx;
       p.y += p.vy;
       p.wobble += p.wobbleSpeed;
 
-      // gentle wobble to avoid straight lines
+      // gentle wobble
       const wx = Math.cos(p.wobble) * 0.6;
       const wy = Math.sin(p.wobble) * 0.6;
 
@@ -84,16 +127,20 @@
       if (p.y - p.r > height) p.y = -p.r;
       if (p.y + p.r < 0) p.y = height + p.r;
 
-      const g = ctx.createRadialGradient(p.x + wx, p.y + wy, 0, p.x, p.y, p.r);
-      g.addColorStop(0, p.color);
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
+      // Draw using pre-rendered sprite
+      const sprite = sprites[p.color];
+      if (sprite) {
+          // Draw image is much faster than createRadialGradient
+          // Center the sprite at p.x, p.y with radius p.r
+          const size = p.r * 2;
+          ctx.drawImage(sprite, p.x + wx - p.r, p.y + wy - p.r, size, size);
+      }
     }
 
-    ctx.globalCompositeOperation = 'source-over';
+    if (!isMobile) {
+        ctx.globalCompositeOperation = 'source-over';
+    }
+    
     rafId = requestAnimationFrame(step);
   }
 

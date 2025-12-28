@@ -18,12 +18,21 @@ try {
     // ignore in older browsers
 }
 
+// Determine base path for images based on current location
+// We check if we are in the 'pages' directory to set the correct relative path
+let imgBasePath = 'images/';
+if (window.location.pathname.includes('/pages/avenues/')) {
+    imgBasePath = '../../images/';
+} else if (window.location.pathname.includes('/pages/')) {
+    imgBasePath = '../images/';
+}
+
 // Hero images used by the background carousel. We'll attempt to preload
 // these so the visible background is ready before we remove the loader.
 const HERO_IMAGES = [
-    '../images/Kandy1.jpeg',
-    '../images/Kandy2.jpg',
-    '../images/Kandy3.jpg'
+    imgBasePath + 'Kandy1.jpeg',
+    imgBasePath + 'Kandy2.jpg',
+    imgBasePath + 'Kandy3.jpg'
 ];
 
 function delay(ms) {
@@ -105,10 +114,12 @@ if (contactForm) {
     
     // Add real-time validation feedback
     formInputs.forEach(input => {
-        input.addEventListener('blur', validateField);
-        input.addEventListener('input', clearValidation);
+        input.addEventListener('blur', (e) => validateField(e.target));
+        input.addEventListener('input', (e) => clearValidation(e.target));
     });
     
+    /* 
+    // Disabled to allow Firebase handling in firebase-public.js
     contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -146,6 +157,7 @@ if (contactForm) {
             submitBtn.classList.remove('loading');
         }, 2000);
     });
+    */
 }
 
 // Enhanced field validation
@@ -432,11 +444,10 @@ function enhanceMobileMenu() {
 function startHeroCarousel() {
     const heroBgCarousel = document.querySelector('.hero-bg-carousel');
     if (!heroBgCarousel) return;
-    const images = [
-        '../images/Kandy1.jpeg',
-        '../images/Kandy2.jpg',
-        '../images/Kandy3.jpg'
-    ];
+    
+    // Use the pre-defined HERO_IMAGES array which has correct paths
+    const images = HERO_IMAGES;
+    
     let current = 0;
     images.forEach((src, idx) => {
         const img = document.createElement('img');

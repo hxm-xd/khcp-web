@@ -1,5 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, where, limit, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, where, limit, doc, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import DOMPurify from "https://cdn.jsdelivr.net/npm/dompurify@3.0.6/+esm";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR97VU9ug7TVOLpzY1Tz1NkOjbrzrfQWk",
@@ -92,11 +93,10 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
         const html = `
           <div class="project-card" data-aos="fade-up">
             <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-hands-helping"></i>'}
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-hands-helping"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(stripHtml(p.description || p.avenue)).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-tag"></i>
@@ -107,7 +107,7 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
                   ${dateStr}
                 </span>
               </div>
-              <a href="/pages/project-details.html?id=${doc.id}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
+              <a href="/pages/project-details.html?id=${doc.id}" class="read-more-btn">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -158,18 +158,17 @@ if (page === 'blog.html') {
         const html = `
           <div class="project-card" data-aos="fade-up">
             <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-pen-nib"></i>'}
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-pen-nib"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(stripHtml(p.excerpt || p.content || '')).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-calendar"></i>
                   ${date}
                 </span>
               </div>
-              <a href="blog-details.html?id=${doc.id}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
+              <a href="blog-details.html?id=${doc.id}" class="read-more-btn">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -219,8 +218,8 @@ if (page === 'projects.html') {
         const projects = groups[key];
         
         const sectionHtml = `
-          <div class="month-section" style="margin-bottom: 40px;">
-            <h3 style="margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;">${escapeHtml(key)}</h3>
+          <div class="month-section">
+            <h3 class="month-heading">${escapeHtml(key)}</h3>
             <div class="projects-grid">
               ${projects.map(p => {
                  const dateObj = p.date ? new Date(p.date) : (p.createdAt ? new Date(p.createdAt) : new Date());
@@ -228,11 +227,10 @@ if (page === 'projects.html') {
                  return `
                 <div class="project-card" data-aos="fade-up">
                   <div class="project-image">
-                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
+                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-project-diagram"></i>'}
                   </div>
                   <div class="project-content">
                     <h3>${escapeHtml(p.title)}</h3>
-                    <p>${escapeHtml(stripHtml(p.description || p.avenue)).substring(0, 100)}...</p>
                     <div class="project-stats">
                       <span class="project-stat">
                         <i class="fas fa-tag"></i>
@@ -243,7 +241,7 @@ if (page === 'projects.html') {
                         ${dateStr}
                       </span>
                     </div>
-                    <a href="project-details.html?id=${p.id || ''}" class="read-more-btn" style="display: inline-block; margin-top: 1rem; color: #D22163; font-weight: 600; text-decoration: none;">Read More &rarr;</a>
+                    <a href="project-details.html?id=${p.id || ''}" class="read-more-btn">Read More &rarr;</a>
                   </div>
                 </div>
               `}).join('')}
@@ -339,7 +337,7 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             <ul class="director-list">
               ${list.map(d => `
                 <li class="director">
-                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; margin-right:10px;">` : ''}
+                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" class="director-img">` : ''}
                   <div>
                     <div class="director-name">${escapeHtml(d.name)}</div>
                     <div class="director-role">${escapeHtml(d.avenue)} Director</div>
@@ -398,17 +396,17 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         const html = `
           <div class="project-card" data-aos="fade-up">
             <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" style="width:100%; height:100%; object-fit:cover;">` : '<i class="fas fa-project-diagram"></i>'}
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-project-diagram"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
-              <p>${escapeHtml(stripHtml(p.description || '')).substring(0, 100)}...</p>
               <div class="project-stats">
                 <span class="project-stat">
                   <i class="fas fa-calendar"></i>
                   ${dateStr}
                 </span>
               </div>
+              <a href="project-details.html?id=${p.id || ''}" class="read-more-btn">Read More &rarr;</a>
             </div>
           </div>
         `;
@@ -473,6 +471,13 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             iconEl.className = 'fas fa-star'; // Default
         }
 
+        // Update Title
+        const titleEl = document.getElementById('avenueTitle');
+        if (titleEl) {
+          titleEl.textContent = data.name;
+          document.title = `${data.name} | Rotaract Club of Kandy Hill Capital`;
+        }
+
         // Update Description
         const descEl = document.getElementById('avenueDescription');
         if (descEl && data.description) {
@@ -509,14 +514,14 @@ async function loadNavbarAvenues() {
   if (!dropdown) return;
 
   try {
-    const snap = await getDocs(collection(db, 'avenues'));
+    // const snap = await getDocs(collection(db, 'avenues'));
     let avenues = [];
     
-    if (!snap.empty) {
-      avenues = snap.docs.map(d => d.data());
-    }
+    // if (!snap.empty) {
+    //   avenues = snap.docs.map(d => d.data());
+    // }
 
-    // Ensure default avenues are present if DB is empty or missing them
+    // Use static pages only
     const defaults = [
       { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
       { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
@@ -553,9 +558,12 @@ async function loadNavbarAvenues() {
     // Order: Club, Community, International, Professional
     const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development', 'Sports and Recreational Activities', 'Membership Development'];
     avenues.sort((a, b) => {
-      const nameA = a.name ? a.name.trim() : '';
-      const nameB = b.name ? b.name.trim() : '';
-      return order.indexOf(nameA) - order.indexOf(nameB);
+      const idxA = order.indexOf(a.name);
+      const idxB = order.indexOf(b.name);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.name.localeCompare(b.name);
     });
 
     // Determine prefix based on current location
@@ -581,8 +589,8 @@ async function loadNavbarAvenues() {
              href = prefix + a.link;
         }
       } else {
-         // Fallback
-         href = (prefix === 'pages/' ? '' : prefix) + 'avenue.html?name=' + encodeURIComponent(a.name);
+        // Dynamic link for new avenues
+        href = `${prefix}avenue.html?name=${encodeURIComponent(a.name)}`;
       }
       
       const li = document.createElement('li');
@@ -720,6 +728,8 @@ if (page === 'project-details.html') {
               <span><i class="fas fa-tag"></i> ${escapeHtml(p.avenue)}</span>
               <span><i class="fas fa-calendar"></i> ${dateStr}</span>
               ${p.chair ? `<span><i class="fas fa-user"></i> ${escapeHtml(p.chair)}</span>` : ''}
+              ${p.location ? `<span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.location)}</span>` : ''}
+              ${p.beneficiaries ? `<span><i class="fas fa-users"></i> ${escapeHtml(p.beneficiaries)}</span>` : ''}
             </div>
           </div>
           
@@ -729,8 +739,8 @@ if (page === 'project-details.html') {
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
-            ${p.description ? `<div class="rich-text">${p.description}</div>` : ''}
-            ${p.content ? `<div class="rich-text">${p.content}</div>` : ''} 
+            ${p.description ? `<div class="rich-text">${DOMPurify.sanitize(p.description)}</div>` : ''}
+            ${p.content ? `<div class="rich-text">${DOMPurify.sanitize(p.content)}</div>` : ''} 
           </div>
 
           <div style="text-align: center; margin-top: 3rem;">
@@ -784,7 +794,7 @@ if (page === 'blog-details.html') {
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
-            ${p.content ? `<div class="rich-text">${p.content}</div>` : `<p>${escapeHtml(p.excerpt || '')}</p>`}
+            ${p.content ? `<div class="rich-text">${DOMPurify.sanitize(p.content)}</div>` : `<p>${escapeHtml(p.excerpt || '')}</p>`}
           </div>
 
           <div style="text-align: center; margin-top: 3rem;">
@@ -802,5 +812,131 @@ if (page === 'blog-details.html') {
   loadBlogDetails();
 }
 
+// 9. Avenues List Page
+if (page === 'avenues.html' && !path.includes('/admin/')) {
+  async function loadAvenuesList() {
+    const container = document.querySelector('.avenues-grid');
+    if (!container) return;
+
+    try {
+      // const snap = await getDocs(collection(db, 'avenues'));
+      let avenues = [];
+      // if (!snap.empty) {
+      //   avenues = snap.docs.map(d => d.data());
+      // }
+
+      // Use static pages only
+      const defaults = [
+        { name: 'Community Service', link: 'avenues/community-service.html', description: 'Addressing the needs of the local community through impactful projects and initiatives.', icon: 'fa-hands-helping' },
+        { name: 'Club Service', link: 'avenues/club-service.html', description: 'Fostering fellowship among members and strengthening the functioning of the club.', icon: 'fa-users' },
+        { name: 'Professional Development', link: 'avenues/professional-development.html', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fa-briefcase' },
+        { name: 'International Service', link: 'avenues/international-service.html', description: 'Promoting international understanding and goodwill through global projects and partnerships.', icon: 'fa-globe' }
+      ];
+
+      avenues = defaults;
+
+      // Sort avenues
+      const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
+      avenues.sort((a, b) => {
+        const idxA = order.indexOf(a.name);
+        const idxB = order.indexOf(b.name);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      container.innerHTML = '';
+      avenues.forEach((a, index) => {
+        let href = '#';
+        if (a.link) {
+           href = a.link;
+        } else {
+           href = `avenue.html?name=${encodeURIComponent(a.name)}`;
+        }
+
+        // Default icon if not present
+        const iconClass = a.icon || 'fa-star';
+
+        const html = `
+          <div class="avenue-item" data-aos="fade-up" data-aos-delay="${index * 100}">
+            <div class="avenue-icon"><i class="fas ${iconClass}"></i></div>
+            <div class="avenue-label">
+              <a href="${href}">${escapeHtml(a.name)}</a>
+            </div>
+            <p>
+              ${escapeHtml(a.description || '')}
+            </p>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+      });
+
+    } catch (e) {
+      console.error("Error loading avenues list", e);
+    }
+  }
+  loadAvenuesList();
+}
+
 loadNavbarAvenues();
+
 document.addEventListener('DOMContentLoaded', loadNavbarAvenues);
+
+
+// 8. Contact Form Handling
+const contactForm = document.querySelector('.contact-form form');
+if (contactForm) {
+  console.log("Contact form found, attaching listener");
+  contactForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    console.log("Form submitted");
+    
+    const nameInput = this.querySelector('input[type="text"]');
+    const emailInput = this.querySelector('input[type="email"]');
+    const messageInput = this.querySelector('textarea');
+    const submitBtn = this.querySelector('button[type="submit"]');
+    
+    if (!nameInput || !emailInput || !messageInput) {
+        console.error("Form inputs not found");
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
+    const message = messageInput.value.trim();
+    
+    if (!name || !email || !message) {
+      if (window.showNotification) window.showNotification('Please fill in all fields.', 'error');
+      else alert('Please fill in all fields.');
+      return;
+    }
+    
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+      await addDoc(collection(db, 'messages'), {
+        name,
+        email,
+        message,
+        timestamp: new Date(),
+        read: false
+      });
+      
+      if (window.showNotification) window.showNotification('Message sent successfully!', 'success');
+      else alert('Message sent successfully!');
+      
+      this.reset();
+    } catch (e) {
+      console.error('Error sending message', e);
+      if (window.showNotification) window.showNotification('Error sending message. Please try again.', 'error');
+      else alert('Error sending message. Please try again.');
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+}
+

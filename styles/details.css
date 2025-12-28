@@ -1,0 +1,139 @@
+/* Details Page Styles (Blog & Projects) */
+.detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.detail-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Project details header alignment override */
+.project-detail .detail-header {
+    text-align: left;
+}
+
+.detail-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.detail-meta {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+/* Project details meta alignment override */
+.project-detail .detail-meta {
+    justify-content: flex-start;
+}
+
+.detail-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-image {
+    display: block;
+    width: 600px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.detail-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+}
+
+.detail-content p {
+    margin-bottom: 1.5rem;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+}
+
+.back-btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* Loading State */
+.skeleton {
+    background: #eee;
+    background: linear-gradient(
+        110deg,
+        #ececec 8%,
+        #f5f5f5 18%,
+        #ececec 33%
+    );
+    border-radius: 5px;
+    background-size: 200% 100%;
+    animation: 1.5s shine linear infinite;
+}
+
+@keyframes shine {
+    to {
+        background-position-x: -200%;
+    }
+}
+
+.skeleton-title {
+    height: 40px;
+    width: 70%;
+    margin: 0 auto 1rem;
+}
+
+/* Project details skeleton alignment override */
+.project-detail .skeleton-title {
+    margin: 0 0 1rem 0;
+}
+
+.skeleton-meta {
+    height: 20px;
+    width: 40%;
+    margin: 0 auto 2rem;
+}
+
+/* Project details skeleton alignment override */
+.project-detail .skeleton-meta {
+    margin: 0 0 2rem 0;
+}
+
+.skeleton-image {
+    height: 400px;
+    width: 100%;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.skeleton-text {
+    height: 20px;
+    width: 100%;
+    margin-bottom: 1rem;
+}

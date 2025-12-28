@@ -243,7 +243,10 @@ if (page === 'dashboard.html') {
       try {
         const snap = await getDocs(collection(db, colName));
         const el = document.getElementById(`count${colName.charAt(0).toUpperCase() + colName.slice(1)}`);
-        if (el) el.textContent = snap.size;
+        if (el) {
+          el.textContent = snap.size;
+          el.classList.remove('skeleton', 'skeleton-h3');
+        }
       } catch (e) {
         console.error(`Error loading count for ${colName}`, e);
       }
@@ -280,6 +283,11 @@ if (page === 'dashboard.html') {
       }
     } catch (e) {
       console.error("Error loading stats", e);
+    } finally {
+      if (statMembers) statMembers.classList.remove('skeleton');
+      if (statProjects) statProjects.classList.remove('skeleton');
+      if (statYears) statYears.classList.remove('skeleton');
+      if (statHours) statHours.classList.remove('skeleton');
     }
   }
 
@@ -318,6 +326,7 @@ if (page === 'blog.html') {
   const list = document.getElementById('postsList');
   const form = document.getElementById('postForm');
   const titleInput = document.getElementById('postTitle');
+  const authorInput = document.getElementById('postAuthor');
   const excerptInput = document.getElementById('postExcerpt');
   const imageInput = document.getElementById('postImage');
   const contentInput = document.getElementById('postContent');
@@ -327,11 +336,18 @@ if (page === 'blog.html') {
   let quill = null;
 
   if (document.getElementById('postContentEditor')) {
+    if (window.Quill) {
+      var Size = window.Quill.import('attributors/style/size');
+      Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'];
+      window.Quill.register(Size, true);
+    }
+
     quill = new Quill('#postContentEditor', {
       theme: 'snow',
       modules: {
         toolbar: [
           [{ 'header': [1, 2, 3, false] }],
+          [{ 'size': ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'] }],
           ['bold', 'italic', 'underline', 'strike'],
           ['blockquote', 'code-block'],
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -367,6 +383,7 @@ if (page === 'blog.html') {
       e.preventDefault();
       const data = {
         title: titleInput.value,
+        author: authorInput ? authorInput.value : '',
         excerpt: excerptInput.value,
         imageUrl: imageInput ? imageInput.value : '',
         content: quill ? quill.root.innerHTML : (contentInput ? contentInput.value : ''),
@@ -409,6 +426,7 @@ if (page === 'blog.html') {
         const post = snap.docs.find(d => d.id === id).data();
         
         titleInput.value = post.title;
+        if(authorInput) authorInput.value = post.author || '';
         excerptInput.value = post.excerpt;
         if(imageInput) imageInput.value = post.imageUrl || '';
         if(contentInput) contentInput.value = post.content || '';
@@ -432,6 +450,9 @@ if (page === 'projects.html') {
   const form = document.getElementById('projectForm');
   const titleInput = document.getElementById('projectTitle');
   const avenueInput = document.getElementById('projectAvenue');
+  const chairInput = document.getElementById('projectChair');
+  const locationInput = document.getElementById('projectLocation');
+  const beneficiariesInput = document.getElementById('projectBeneficiaries');
   const dateInput = document.getElementById('projectDate');
   const imageInput = document.getElementById('projectImage');
   const descInput = document.getElementById('projectDescription');
@@ -441,11 +462,18 @@ if (page === 'projects.html') {
   let quill = null;
 
   if (document.getElementById('projectDescriptionEditor')) {
+    if (window.Quill) {
+      var Size = window.Quill.import('attributors/style/size');
+      Size.whitelist = ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'];
+      window.Quill.register(Size, true);
+    }
+
     quill = new Quill('#projectDescriptionEditor', {
       theme: 'snow',
       modules: {
         toolbar: [
           [{ 'header': [1, 2, 3, false] }],
+          [{ 'size': ['10px', '12px', '14px', '16px', '18px', '24px', '32px', '48px'] }],
           ['bold', 'italic', 'underline', 'strike'],
           ['blockquote', 'code-block'],
           [{ 'list': 'ordered'}, { 'list': 'bullet' }],
@@ -487,6 +515,9 @@ if (page === 'projects.html') {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
+        chair: chairInput ? chairInput.value : '',
+        location: locationInput ? locationInput.value : '',
+        beneficiaries: beneficiariesInput ? beneficiariesInput.value : '',
         title: titleInput.value,
         avenue: avenueInput.value,
         date: dateInput.value || new Date().toISOString().split('T')[0],
@@ -533,6 +564,9 @@ if (page === 'projects.html') {
         titleInput.value = project.title;
         avenueInput.value = project.avenue;
         dateInput.value = project.date || '';
+        if(chairInput) chairInput.value = project.chair || '';
+        if(locationInput) locationInput.value = project.location || '';
+        if(beneficiariesInput) beneficiariesInput.value = project.beneficiaries || '';
         if(imageInput) imageInput.value = project.imageUrl || '';
         if(descInput) descInput.value = project.description || '';
         if(quill) quill.root.innerHTML = project.description || '';
@@ -558,6 +592,7 @@ if (page === 'avenues.html') {
   const imageInput = document.getElementById('avenueImage');
   const descInput = document.getElementById('avenueDescription');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  const createBtn = document.getElementById('createAvenueBtn');
 
   let editId = null;
 
@@ -565,6 +600,16 @@ if (page === 'avenues.html') {
   const stat1Value = document.getElementById('stat1Value');
   const stat2Label = document.getElementById('stat2Label');
   const stat2Value = document.getElementById('stat2Value');
+
+  if (createBtn) {
+    createBtn.addEventListener('click', () => {
+      editId = null;
+      resetForm(form, submitBtn, 'Add Avenue');
+      form.style.display = 'block';
+      nameInput.readOnly = false;
+      form.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
 
   async function loadAvenues() {
     renderSkeleton(list);
@@ -597,7 +642,7 @@ if (page === 'avenues.html') {
   }
 
   if (form) {
-    setupCancelButton(form, submitBtn, 'Update Avenue', () => { 
+    setupCancelButton(form, submitBtn, 'Add Avenue', () => { 
       editId = null; 
       form.style.display = 'none';
     });
@@ -819,6 +864,13 @@ if (page === 'profile.html') {
     } catch (e) {
       console.error("Error loading settings", e);
       showToast("Error loading settings", "error");
+    } finally {
+      if (nameInput) nameInput.classList.remove('skeleton');
+      if (emailInput) emailInput.classList.remove('skeleton');
+      if (statMembers) statMembers.classList.remove('skeleton');
+      if (statProjects) statProjects.classList.remove('skeleton');
+      if (statYears) statYears.classList.remove('skeleton');
+      if (statHours) statHours.classList.remove('skeleton');
     }
   }
 
@@ -944,3 +996,125 @@ try {
     });
   }
 } catch (e) { console.error("Sidebar toggle error", e); }
+// --- Messages Logic ---
+
+let currentMessageId = null;
+
+function openMessageModal(docSnapshot) {
+  const data = docSnapshot.data();
+  const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'No Date';
+  
+  document.getElementById('modalSender').textContent = data.name || 'Unknown';
+  document.getElementById('modalEmail').textContent = data.email || 'No Email';
+  document.getElementById('modalDate').textContent = date;
+  document.getElementById('modalMessage').textContent = data.message || '';
+  
+  currentMessageId = docSnapshot.id;
+  
+  const modal = document.getElementById('messageModal');
+  if (modal) modal.classList.add('show');
+}
+
+function closeMessageModal() {
+  const modal = document.getElementById('messageModal');
+  if (modal) modal.classList.remove('show');
+  currentMessageId = null;
+}
+
+async function deleteCurrentMessage() {
+  if (!currentMessageId) return;
+  
+  if(confirm('Are you sure you want to delete this message?')) {
+    try {
+      await deleteDoc(doc(db, "messages", currentMessageId));
+      showToast('Message deleted');
+      closeMessageModal();
+      loadMessages(); // Reload list
+    } catch (error) {
+      console.error("Error deleting message: ", error);
+      showToast('Error deleting message', 'error');
+    }
+  }
+}
+
+async function loadMessages() {
+  const list = document.getElementById('messagesList');
+  if (!list) return;
+
+  // Setup modal listeners once
+  if (!window.modalListenersAttached) {
+    const closeBtn = document.getElementById('closeModalBtn');
+    const closeFooterBtn = document.getElementById('closeModalFooterBtn');
+    const deleteBtn = document.getElementById('deleteMessageBtn');
+    const modal = document.getElementById('messageModal');
+    
+    if (closeBtn) closeBtn.addEventListener('click', closeMessageModal);
+    if (closeFooterBtn) closeFooterBtn.addEventListener('click', closeMessageModal);
+    if (deleteBtn) deleteBtn.addEventListener('click', deleteCurrentMessage);
+    
+    // Close on click outside
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeMessageModal();
+        });
+    }
+    
+    window.modalListenersAttached = true;
+  }
+
+  list.innerHTML = '<p class="text-muted">Loading messages...</p>';
+
+  try {
+    const q = query(collection(db, "messages"), orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
+    
+    list.innerHTML = '';
+    
+    if (querySnapshot.empty) {
+      list.innerHTML = '<p class="text-muted">No messages found.</p>';
+      return;
+    }
+
+    querySnapshot.forEach((docSnapshot) => {
+      const data = docSnapshot.data();
+      const date = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'No Date';
+      const rawPreview = data.message ? (data.message.substring(0, 100) + (data.message.length > 100 ? '...' : '')) : '';
+      const preview = escapeHtml(rawPreview);
+      
+      const item = document.createElement('div');
+      item.className = 'list-item';
+      item.style.cursor = 'pointer';
+      item.innerHTML = `
+        <div class="item-content">
+          <div class="item-header">
+            <h4 class="item-title">${data.name || 'Unknown'} <span style="font-weight:normal; font-size: 0.9em; color: #666;">(${data.email || 'No Email'})</span></h4>
+            <span class="item-date">${date}</span>
+          </div>
+          <p class="item-subtitle" style="margin-top: 0.5rem; color: #666;">${preview}</p>
+        </div>
+        <div class="item-actions">
+           <button class="btn-icon view-btn" title="View">
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+      `;
+      
+      item.addEventListener('click', () => openMessageModal(docSnapshot));
+
+      list.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Error loading messages: ", error);
+    list.innerHTML = '<p class="error-text">Error loading messages.</p>';
+  }
+}
+
+if (page === 'messages.html') {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      loadMessages();
+    } else {
+      window.location.href = 'index.html';
+    }
+  });
+}
