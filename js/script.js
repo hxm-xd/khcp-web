@@ -555,8 +555,9 @@ window.addEventListener('load', () => {
         // Start preloading immediately and also enforce a minimum visible time.
         const preloadPromise = preloadImages(HERO_IMAGES, IMAGES_FALLBACK);
         const minDelayPromise = delay(MIN_VISIBLE);
+        const appReadyPromise = window.waitForApp || Promise.resolve();
 
-        Promise.all([preloadPromise, minDelayPromise]).then(() => {
+        Promise.all([preloadPromise, minDelayPromise, appReadyPromise]).then(() => {
             // start fade
             loadingScreen.classList.add('hidden');
 

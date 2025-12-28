@@ -19,6 +19,14 @@ const db = getFirestore(app);
 const path = window.location.pathname;
 const page = path.split('/').pop().split('?')[0]; // Handle query params
 
+// Setup loading coordination
+let resolveAppReady;
+if (page === 'avenue.html') {
+    window.waitForApp = new Promise(resolve => {
+        resolveAppReady = resolve;
+    });
+}
+
 // Helper to escape HTML
 function escapeHtml(text) {
   if (!text) return '';
@@ -473,11 +481,27 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         
         // Update Hero Image
         const heroEl = document.getElementById('avenueHero');
+        const heroContent = document.querySelector('.avenue-hero-content');
+        
+        const showContent = () => {
+            if (heroContent) heroContent.classList.add('loaded');
+            if (resolveAppReady) resolveAppReady();
+        };
+
         if (heroEl && data.imageUrl) {
-            heroEl.style.backgroundImage = `url('${escapeHtml(data.imageUrl)}')`;
-        } else if (heroEl) {
-            // Default gradient or fallback image if needed
-            heroEl.style.background = 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)';
+            const img = new Image();
+            img.onload = () => {
+                heroEl.style.backgroundImage = `url('${escapeHtml(data.imageUrl)}')`;
+                showContent();
+            };
+            img.onerror = showContent; // Proceed even if image fails
+            img.src = data.imageUrl;
+        } else {
+            if (heroEl) {
+                // Default gradient or fallback image if needed
+                heroEl.style.background = 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)';
+            }
+            showContent();
         }
 
         // Update Icon
@@ -492,6 +516,7 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         const titleEl = document.getElementById('avenueTitle');
         if (titleEl) {
           titleEl.textContent = data.name;
+          titleEl.classList.remove('skeleton', 'skeleton-title');
           document.title = `${data.name} | Rotaract Club of Kandy Hill Capital`;
         }
 
@@ -517,9 +542,14 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         if (s2Value && data.stat2Value) {
             s2Value.textContent = data.stat2Value;
         }
+      } else {
+          // No data found, resolve anyway to remove loader
+          if (resolveAppReady) resolveAppReady();
       }
     } catch (e) {
       console.error("Error loading avenue details", e);
+      if (resolveAppReady) resolveAppReady();
+    }
     }
   }
   loadAvenueDetails();
