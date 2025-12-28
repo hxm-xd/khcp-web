@@ -70,10 +70,10 @@ async function seedAvenues() {
     const existingNames = snap.docs.map(d => d.data().name);
     
     const defaults = [
-      { name: 'Community Service', link: 'avenues/community-service.html' },
-      { name: 'Club Service', link: 'avenues/club-service.html' },
-      { name: 'Professional Development', link: 'avenues/professional-development.html' },
-      { name: 'International Service', link: 'avenues/international-service.html' }
+      { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
+      { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
+      { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
+      { name: 'International Service', link: 'avenue.html?name=International%20Service' }
     ];
 
     let added = false;

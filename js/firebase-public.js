@@ -261,7 +261,7 @@ if (page === 'projects.html') {
 }
 
 // 4. Avenue Pages (Directors)
-if (path.includes('/avenues/') || page.includes('service') || page.includes('development')) {
+if (path.includes('/avenues/') || page.includes('service') || page.includes('development') || page === 'avenue.html') {
   async function loadDirectors() {
     // Wait for DOM if needed
     if (document.readyState === 'loading') {
@@ -270,13 +270,16 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
 
     const container = document.querySelector('.director-grid');
     if (!container) {
-      console.log("Director grid container not found");
+      // console.log("Director grid container not found");
       return;
     }
 
-    // Determine avenue from filename
+    // Determine avenue from filename or query param
     let avenueName = '';
-    if (page.includes('community-service')) avenueName = 'Community Service';
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('name')) {
+        avenueName = urlParams.get('name');
+    } else if (page.includes('community-service')) avenueName = 'Community Service';
     else if (page.includes('club-service')) avenueName = 'Club Service';
     else if (page.includes('professional-development')) avenueName = 'Professional Development';
     else if (page.includes('international-service')) avenueName = 'International Service';
@@ -357,9 +360,12 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     const container = document.getElementById('avenueProjectsGrid');
     if (!container) return;
 
-    // Determine avenue from filename
+    // Determine avenue from filename or query param
     let avenueName = '';
-    if (page.includes('community-service')) avenueName = 'Community Service';
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('name')) {
+        avenueName = urlParams.get('name');
+    } else if (page.includes('community-service')) avenueName = 'Community Service';
     else if (page.includes('club-service')) avenueName = 'Club Service';
     else if (page.includes('professional-development')) avenueName = 'Professional Development';
     else if (page.includes('international-service')) avenueName = 'International Service';
@@ -412,14 +418,27 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
   loadAvenueProjects();
 
   async function loadAvenueDetails() {
-    // Determine avenue from filename
+    // Determine avenue from filename or query param
     let avenueName = '';
-    if (page.includes('community-service')) avenueName = 'Community Service';
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('name')) {
+        avenueName = urlParams.get('name');
+    } else if (page.includes('community-service')) avenueName = 'Community Service';
     else if (page.includes('club-service')) avenueName = 'Club Service';
     else if (page.includes('professional-development')) avenueName = 'Professional Development';
     else if (page.includes('international-service')) avenueName = 'International Service';
 
     if (!avenueName) return;
+
+    // Update Title
+    const titleEl = document.querySelector('.section-title h2');
+    if (titleEl) {
+        titleEl.textContent = avenueName;
+    }
+    const breadcrumbEl = document.querySelector('.breadcrumb-item.active');
+    if (breadcrumbEl) {
+        breadcrumbEl.textContent = avenueName;
+    }
 
     try {
       const q = query(collection(db, 'avenues'), where('name', '==', avenueName));
@@ -467,10 +486,10 @@ async function loadNavbarAvenues() {
 
     // Ensure default avenues are present if DB is empty or missing them
     const defaults = [
-      { name: 'Community Service', link: 'avenues/community-service.html' },
-      { name: 'Club Service', link: 'avenues/club-service.html' },
-      { name: 'Professional Development', link: 'avenues/professional-development.html' },
-      { name: 'International Service', link: 'avenues/international-service.html' }
+      { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
+      { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
+      { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
+      { name: 'International Service', link: 'avenue.html?name=International%20Service' }
     ];
 
     defaults.forEach(def => {
@@ -500,16 +519,17 @@ async function loadNavbarAvenues() {
     avenues.forEach(a => {
       let href = '#';
       if (a.link) {
-        // Fix link if it already contains 'avenues/' and we are in 'pages/'
-        // a.link is like 'avenues/community-service.html'
-        
-        if (prefix === '../') {
-           href = prefix + a.link;
-        } else if (prefix === '') {
-           href = a.link;
+        // Handle legacy links or new dynamic links
+        if (a.link.includes('avenues/')) {
+             // Legacy link stored in DB? Convert to dynamic if possible or keep as is (but files are gone)
+             // Better to just use the name to construct the new link if it looks like a legacy link
+             href = (prefix === 'pages/' ? '' : prefix) + 'avenue.html?name=' + encodeURIComponent(a.name);
         } else {
-           href = prefix + a.link;
+             href = prefix + a.link;
         }
+      } else {
+         // Fallback
+         href = (prefix === 'pages/' ? '' : prefix) + 'avenue.html?name=' + encodeURIComponent(a.name);
       }
       
       const li = document.createElement('li');
@@ -520,6 +540,71 @@ async function loadNavbarAvenues() {
   } catch (e) {
     console.error("Error loading navbar avenues", e);
   }
+}
+
+// 8. Avenues List Page
+if (page === 'avenues.html') {
+  async function loadAvenuesList() {
+    const container = document.querySelector('.avenues-grid');
+    if (!container) return;
+
+    try {
+      const snap = await getDocs(collection(db, 'avenues'));
+      let avenues = [];
+      if (!snap.empty) {
+        avenues = snap.docs.map(d => d.data());
+      }
+
+      // Defaults if empty
+      const defaults = [
+        { name: 'Club Service', description: 'Fostering fellowship among members and strengthening the functioning of the club.', icon: 'fas fa-users' },
+        { name: 'Community Service', description: 'Addressing the needs of the local community through impactful projects and initiatives.', icon: 'fas fa-hands-helping' },
+        { name: 'International Service', description: 'Promoting international understanding and goodwill through global projects and partnerships.', icon: 'fas fa-globe' },
+        { name: 'Professional Development', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fas fa-briefcase' }
+      ];
+
+      // Merge defaults if not present
+      defaults.forEach(def => {
+        if (!avenues.find(a => a.name === def.name)) {
+          avenues.push(def);
+        }
+      });
+
+      // Sort
+      const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
+      avenues.sort((a, b) => {
+         let idxA = order.indexOf(a.name);
+         let idxB = order.indexOf(b.name);
+         if (idxA === -1) idxA = 99;
+         if (idxB === -1) idxB = 99;
+         return idxA - idxB;
+      });
+
+      container.innerHTML = '';
+      let delay = 0;
+      avenues.forEach(a => {
+        const link = `avenue.html?name=${encodeURIComponent(a.name)}`;
+        const icon = a.icon || 'fas fa-star';
+        
+        const html = `
+          <div class="avenue-item" data-aos="fade-up" data-aos-delay="${delay}">
+            <div class="avenue-icon"><i class="${escapeHtml(icon)}"></i></div>
+            <div class="avenue-label">
+              <a href="${link}">${escapeHtml(a.name)}</a>
+            </div>
+            <p>${escapeHtml(a.description || '')}</p>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        delay += 100;
+      });
+
+    } catch (e) {
+      console.error("Error loading avenues list", e);
+      container.innerHTML = '<p>Error loading avenues.</p>';
+    }
+  }
+  loadAvenuesList();
 }
 
 // 6. Project Details Page

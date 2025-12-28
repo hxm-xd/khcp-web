@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:;"
+    />
+    <meta
       name="description"
       content="Avenues - Rotaract Club of Kandy Hill Capital"
     />
@@ -81,18 +85,20 @@
             >
             <ul class="dropdown">
               <li>
-                <a href="avenues/community-service.html">Community Service</a>
+                <a href="avenue.html?name=Community%20Service"
+                  >Community Service</a
+                >
               </li>
               <li>
-                <a href="avenues/club-service.html">Club Service</a>
+                <a href="avenue.html?name=Club%20Service">Club Service</a>
               </li>
               <li>
-                <a href="avenues/professional-development.html"
+                <a href="avenue.html?name=Professional%20Development"
                   >Professional Development</a
                 >
               </li>
               <li>
-                <a href="avenues/international-service.html"
+                <a href="avenue.html?name=International%20Service"
                   >International Service</a
                 >
               </li>
@@ -135,50 +141,8 @@
       <h2>Avenues of Service</h2>
       <div class="container">
         <div class="avenues-grid">
-          <div class="avenue-item" data-aos="fade-up">
-            <div class="avenue-icon"><i class="fas fa-users"></i></div>
-            <div class="avenue-label">
-              <a href="avenues/club-service.html">Club Service</a>
-            </div>
-            <p>
-              Fostering fellowship among members and strengthening the
-              functioning of the club.
-            </p>
-          </div>
-          <div class="avenue-item" data-aos="fade-up" data-aos-delay="100">
-            <div class="avenue-icon"><i class="fas fa-hands-helping"></i></div>
-            <div class="avenue-label">
-              <a href="avenues/community-service.html">Community Service</a>
-            </div>
-            <p>
-              Addressing the needs of the local community through impactful
-              projects and initiatives.
-            </p>
-          </div>
-          <div class="avenue-item" data-aos="fade-up" data-aos-delay="200">
-            <div class="avenue-icon"><i class="fas fa-globe"></i></div>
-            <div class="avenue-label">
-              <a href="avenues/international-service.html"
-                >International Service</a
-              >
-            </div>
-            <p>
-              Promoting international understanding and goodwill through global
-              projects and partnerships.
-            </p>
-          </div>
-          <div class="avenue-item" data-aos="fade-up" data-aos-delay="300">
-            <div class="avenue-icon"><i class="fas fa-briefcase"></i></div>
-            <div class="avenue-label">
-              <a href="avenues/professional-development.html"
-                >Professional Development</a
-              >
-            </div>
-            <p>
-              Enhancing the skills and leadership abilities of members for
-              personal and professional growth.
-            </p>
-          </div>
+          <!-- Dynamically populated -->
+          <p style="text-align: center; width: 100%">Loading avenues...</p>
         </div>
       </div>
     </section>

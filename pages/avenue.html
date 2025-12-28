@@ -7,42 +7,7 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:;"
     />
-    <meta
-      name="description"
-      content="About Rotaract Club of Kandy Hill Capital"
-    />
-    <title>About | Rotaract Club of Kandy Hill Capital</title>
-    <link rel="canonical" href="https://rackhcp.vercel.app/pages/about.html" />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="About | Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      property="og:description"
-      content="About Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      property="og:url"
-      content="https://rackhcp.vercel.app/pages/about.html"
-    />
-    <meta
-      property="og:image"
-      content="https://rackhcp.vercel.app/images/Kandy1.jpeg"
-    />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:title"
-      content="About | Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      name="twitter:description"
-      content="About Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      name="twitter:image"
-      content="https://rackhcp.vercel.app/images/Kandy1.jpeg"
-    />
+    <title>Avenue | Rotaract Club of Kandy Hill Capital</title>
     <link rel="stylesheet" href="../styles/styles.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
@@ -133,47 +98,59 @@
         <div class="hamburger"><span></span><span></span><span></span></div>
       </div>
     </nav>
+
     <section class="about" style="padding-top: 120px">
       <div class="container">
-        <h2>About Our Club</h2>
-        <div class="about-content">
-          <div class="about-text" data-aos="fade-right">
-            <h3>Who We Are</h3>
-            <p>
-              Rotaract Club of Kandy Hill Capital is a dynamic youth
-              organization affiliated with Rotary International. We bring
-              together young professionals and students aged 18-30 who are
-              passionate about leadership, community service, and international
-              understanding.
-            </p>
-            <h3>Our Mission</h3>
-            <p>
-              To develop young adults as leaders in their communities and
-              workplaces through leadership training, community service, and
-              international understanding.
-            </p>
+        <div class="section-title">
+          <h2>Avenue Name</h2>
+        </div>
+
+        <div class="avenue-details" data-aos="fade-up">
+          <p
+            id="avenueDescription"
+            style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem"
+          >
+            Loading description...
+          </p>
+
+          <div class="about-stats">
+            <div class="stat-item">
+              <div class="stat-number" id="stat1Value">-</div>
+              <div class="stat-label" id="stat1Label">Projects</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="stat2Value">-</div>
+              <div class="stat-label" id="stat2Label">Volunteers</div>
+            </div>
           </div>
-          <div class="about-stats" data-aos="fade-left">
-            <div class="stat-item">
-              <div class="stat-number" id="displayMembers">50+</div>
-              <div class="stat-label">Active Members</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="displayProjects">25+</div>
-              <div class="stat-label">Projects Completed</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="displayYears">5+</div>
-              <div class="stat-label">Years of Service</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="displayHours">1000+</div>
-              <div class="stat-label">Hours Volunteered</div>
-            </div>
+        </div>
+
+        <div
+          class="directors-section"
+          style="margin-top: 4rem"
+          data-aos="fade-up"
+        >
+          <h3 style="margin-bottom: 1.5rem">Directors</h3>
+          <div class="director-grid">
+            <!-- Directors loaded here -->
+            <p>Loading directors...</p>
+          </div>
+        </div>
+
+        <div
+          class="projects-section"
+          style="margin-top: 4rem"
+          data-aos="fade-up"
+        >
+          <h3 style="margin-bottom: 1.5rem">Recent Projects</h3>
+          <div class="projects-grid" id="avenueProjectsGrid">
+            <!-- Projects loaded here -->
+            <p>Loading projects...</p>
           </div>
         </div>
       </div>
     </section>
+
     <footer class="footer">
       <div class="container">
         <div class="footer-content">

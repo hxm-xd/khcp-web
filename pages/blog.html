@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:;"
+    />
+    <meta
       name="description"
       content="KHCP Blog - Stories, updates, and news from Rotaract Club of Kandy Hill Capital"
     />
@@ -78,18 +82,20 @@
             >
             <ul class="dropdown">
               <li>
-                <a href="avenues/community-service.html">Community Service</a>
+                <a href="avenue.html?name=Community%20Service"
+                  >Community Service</a
+                >
               </li>
               <li>
-                <a href="avenues/club-service.html">Club Service</a>
+                <a href="avenue.html?name=Club%20Service">Club Service</a>
               </li>
               <li>
-                <a href="avenues/professional-development.html"
+                <a href="avenue.html?name=Professional%20Development"
                   >Professional Development</a
                 >
               </li>
               <li>
-                <a href="avenues/international-service.html"
+                <a href="avenue.html?name=International%20Service"
                   >International Service</a
                 >
               </li>
