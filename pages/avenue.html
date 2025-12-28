@@ -5,40 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Projects - Rotaract Club of Kandy Hill Capital"
+      content="Avenue - Rotaract Club of Kandy Hill Capital"
     />
-    <title>Projects | Rotaract Club of Kandy Hill Capital</title>
-    <link rel="canonical" href="https://www.rackhcp.org/pages/projects.html" />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="Projects | Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      property="og:description"
-      content="Our Projects - Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      property="og:url"
-      content="https://www.rackhcp.org/pages/projects.html"
-    />
-    <meta
-      property="og:image"
-      content="https://www.rackhcp.org/images/Kandy2.jpg"
-    />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta
-      name="twitter:title"
-      content="Projects | Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      name="twitter:description"
-      content="Our Projects - Rotaract Club of Kandy Hill Capital"
-    />
-    <meta
-      name="twitter:image"
-      content="https://www.rackhcp.org/images/Kandy2.jpg"
-    />
+    <title>Avenue | Rotaract Club of Kandy Hill Capital</title>
     <link rel="stylesheet" href="../styles/styles.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
@@ -64,7 +33,7 @@
         <div class="nav-logo">
           <img
             src="../images/KHCP-Logo.png"
-            alt="Rotaract Club of Kandy Hill Capital Logo"
+            alt="Rotaract Club of Kandy Hill Capital logo"
             class="logo-image"
           />
         </div>
@@ -77,32 +46,7 @@
               >Avenues <span class="chev">▾</span></a
             >
             <ul class="dropdown">
-              <li>
-                <a href="avenues/community-service.html">Community Service</a>
-              </li>
-              <li>
-                <a href="avenues/club-service.html">Club Service</a>
-              </li>
-              <li>
-                <a href="avenues/professional-development.html"
-                  >Professional Development</a
-                >
-              </li>
-              <li>
-                <a href="avenues/international-service.html"
-                  >International Service</a
-                >
-              </li>
-              <li>
-                <a href="avenues/sports-and-recreational-activities.html"
-                  >Sports and Recreational Activities</a
-                >
-              </li>
-              <li>
-                <a href="avenues/membership-development.html"
-                  >Membership Development</a
-                >
-              </li>
+              <!-- Dynamically populated -->
             </ul>
           </li>
           <li><a href="blog.html">Blog</a></li>
@@ -137,14 +81,58 @@
         <div class="hamburger"><span></span><span></span><span></span></div>
       </div>
     </nav>
-    <section class="projects" style="padding-top: 120px">
+
+    <section class="about" style="padding-top: 120px">
       <div class="container">
-        <h2>Our Projects</h2>
-        <div id="projectsContainer">
-          <!-- Projects grouped by Month/Year loaded dynamically -->
+        <h2 id="avenueTitle">Loading...</h2>
+        <div class="about-content">
+          <div class="about-text" data-aos="fade-right">
+            <h3 id="avenueSubtitle">Overview</h3>
+            <p id="avenueDescription">Loading description...</p>
+          </div>
+          <div class="about-stats" data-aos="fade-left">
+            <div class="stat-item">
+              <div class="stat-number" id="stat1Value">-</div>
+              <div class="stat-label" id="stat1Label">Stat 1</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="stat2Value">-</div>
+              <div class="stat-label" id="stat2Label">Stat 2</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
+
+    <!-- Avenue Directors: grouped by year -->
+    <section class="avenue-directors" aria-labelledby="directors-heading">
+      <div class="container">
+        <h3 id="directors-heading">Avenue Directors</h3>
+        <br />
+        <p class="lead">
+          Meet the directors who lead this avenue. Listed by year (most recent
+          first).
+        </p>
+        <div class="director-grid">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Avenue Projects -->
+    <section
+      class="avenue-projects"
+      style="background-color: #f8f9fa; padding: 60px 0"
+    >
+      <div class="container">
+        <h3>Our Projects</h3>
+        <br />
+        <div class="projects-grid" id="avenueProjectsGrid">
+          <!-- Projects loaded dynamically -->
+        </div>
+      </div>
+    </section>
+
     <footer class="footer">
       <div class="container">
         <div class="footer-content">
@@ -152,7 +140,7 @@
             <div class="footer-logo">
               <img
                 src="../images/KHCP-Logo.png"
-                alt="Rotaract Club of Kandy Hill Capital Logo"
+                alt="Rotaract Club of Kandy Hill Capital logo"
                 class="footer-logo-image"
               />
             </div>
@@ -175,7 +163,7 @@
           <div class="footer-section">
             <h4>Quick Links</h4>
             <ul>
-              <li><a href="/">Home</a></li>
+              <li><a href="../index.html">Home</a></li>
               <li><a href="about.html">About</a></li>
               <li><a href="projects.html">Projects</a></li>
               <li><a href="avenues.html">Avenues</a></li>

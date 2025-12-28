@@ -69,14 +69,23 @@
         </header>
 
         <div class="content-wrapper">
-          <p class="text-muted mb-5">
-            Select an avenue below to edit its details. New avenues cannot be
-            added.
-          </p>
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 1rem;
+            "
+          >
+            <p class="text-muted">Manage your avenues here.</p>
+            <button id="createAvenueBtn" class="btn btn-primary">
+              <i class="fas fa-plus"></i> Create Avenue
+            </button>
+          </div>
 
           <form id="avenueForm" class="section-card form-stack hidden">
             <div class="section-header">
-              <h3 class="section-title">Edit Avenue</h3>
+              <h3 class="section-title">Avenue Details</h3>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -85,8 +94,6 @@
                   id="avenueName"
                   placeholder="e.g. Community Service"
                   required
-                  readonly
-                  class="input-readonly"
                 />
               </div>
               <div class="form-group">
@@ -138,12 +145,12 @@
 
           <div id="avenuesList" class="list-container">
             <div class="list-item">
-                <div class="skeleton skeleton-text" style="width: 40%;"></div>
-                <div class="skeleton skeleton-text" style="width: 20%;"></div>
+              <div class="skeleton skeleton-text" style="width: 40%"></div>
+              <div class="skeleton skeleton-text" style="width: 20%"></div>
             </div>
             <div class="list-item">
-                <div class="skeleton skeleton-text" style="width: 50%;"></div>
-                <div class="skeleton skeleton-text" style="width: 30%;"></div>
+              <div class="skeleton skeleton-text" style="width: 50%"></div>
+              <div class="skeleton skeleton-text" style="width: 30%"></div>
             </div>
           </div>
         </div>

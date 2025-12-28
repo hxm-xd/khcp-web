@@ -70,10 +70,12 @@ async function seedAvenues() {
     const existingNames = snap.docs.map(d => d.data().name);
     
     const defaults = [
-      { name: 'Community Service', link: 'avenues/community-service.html' },
-      { name: 'Club Service', link: 'avenues/club-service.html' },
-      { name: 'Professional Development', link: 'avenues/professional-development.html' },
-      { name: 'International Service', link: 'avenues/international-service.html' }
+      { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
+      { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
+      { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
+      { name: 'International Service', link: 'avenue.html?name=International%20Service' },
+      { name: 'Sports and Recreational Activities', link: 'avenue.html?name=Sports%20and%20Recreational%20Activities' },
+      { name: 'Membership Development', link: 'avenue.html?name=Membership%20Development' }
     ];
 
     let added = false;
@@ -571,6 +573,7 @@ if (page === 'avenues.html') {
   const imageInput = document.getElementById('avenueImage');
   const descInput = document.getElementById('avenueDescription');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+  const createBtn = document.getElementById('createAvenueBtn');
 
   let editId = null;
 
@@ -578,6 +581,16 @@ if (page === 'avenues.html') {
   const stat1Value = document.getElementById('stat1Value');
   const stat2Label = document.getElementById('stat2Label');
   const stat2Value = document.getElementById('stat2Value');
+
+  if (createBtn) {
+    createBtn.addEventListener('click', () => {
+      editId = null;
+      resetForm(form, submitBtn, 'Add Avenue');
+      form.style.display = 'block';
+      nameInput.readOnly = false;
+      form.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
 
   async function loadAvenues() {
     try {
@@ -587,7 +600,7 @@ if (page === 'avenues.html') {
       renderList(list, avenues, (a) => `
         <h4>${escapeHtml(a.name)}</h4>
         <div class="meta">${escapeHtml(a.description || '')}</div>
-      `, false); 
+      `, true); 
     } catch (e) {
       console.error("Error loading avenues", e);
       showToast("Error loading avenues", "error");
@@ -595,17 +608,16 @@ if (page === 'avenues.html') {
   }
 
   if (form) {
-    setupCancelButton(form, submitBtn, 'Update Avenue', () => { 
+    setupCancelButton(form, submitBtn, 'Add Avenue', () => { 
       editId = null; 
       form.style.display = 'none';
     });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      if (!editId) return; // Only allow updates
 
       const data = { 
-        // name: nameInput.value, // Name is read-only/fixed
+        name: nameInput.value,
         imageUrl: imageInput ? imageInput.value : '',
         description: descInput ? descInput.value : '',
         stat1Label: stat1Label ? stat1Label.value : '',
@@ -615,10 +627,18 @@ if (page === 'avenues.html') {
       };
 
       try {
-        await updateDoc(doc(db, 'avenues', editId), data);
-        showToast("Avenue updated");
+        if (editId) {
+          // Don't update name on edit to avoid breaking links if we want to be strict, 
+          // but for flexibility let's allow it or keep it read-only in UI.
+          // For now, we update everything.
+          await updateDoc(doc(db, 'avenues', editId), data);
+          showToast("Avenue updated");
+        } else {
+          await addDoc(collection(db, 'avenues'), data);
+          showToast("Avenue created");
+        }
         
-        editId = resetForm(form, submitBtn, 'Update Avenue');
+        editId = resetForm(form, submitBtn, 'Add Avenue');
         form.style.display = 'none';
         loadAvenues();
       } catch (err) {
@@ -635,10 +655,17 @@ if (page === 'avenues.html') {
       const id = btn.dataset.id;
       const action = btn.dataset.action;
 
-      if (action === 'edit') {
+      if (action === 'delete') {
+        if (confirm('Delete this avenue?')) {
+          await deleteDoc(doc(db, 'avenues', id));
+          showToast("Avenue deleted");
+          loadAvenues();
+        }
+      } else if (action === 'edit') {
         const snap = await getDocs(collection(db, 'avenues'));
         const avenue = snap.docs.find(d => d.id === id).data();
         nameInput.value = avenue.name;
+        nameInput.readOnly = true; // Prevent changing name of existing avenues to avoid breaking legacy links
         if(imageInput) imageInput.value = avenue.imageUrl || '';
         if(descInput) descInput.value = avenue.description || '';
         if(stat1Label) stat1Label.value = avenue.stat1Label || '';

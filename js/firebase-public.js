@@ -259,7 +259,7 @@ if (page === 'projects.html') {
 }
 
 // 4. Avenue Pages (Directors)
-if (path.includes('/avenues/') || page.includes('service') || page.includes('development')) {
+if (path.includes('/avenues/') || page.includes('service') || page.includes('development') || page === 'avenue.html') {
   async function loadDirectors() {
     // Wait for DOM if needed
     if (document.readyState === 'loading') {
@@ -272,12 +272,19 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
       return;
     }
 
-    // Determine avenue from filename
+    // Determine avenue from filename or URL param
     let avenueName = '';
-    if (page.includes('community-service')) avenueName = 'Community Service';
-    else if (page.includes('club-service')) avenueName = 'Club Service';
-    else if (page.includes('professional-development')) avenueName = 'Professional Development';
-    else if (page.includes('international-service')) avenueName = 'International Service';
+    if (page === 'avenue.html') {
+      const params = new URLSearchParams(window.location.search);
+      avenueName = params.get('name');
+    } else {
+      if (page.includes('community-service')) avenueName = 'Community Service';
+      else if (page.includes('club-service')) avenueName = 'Club Service';
+      else if (page.includes('professional-development')) avenueName = 'Professional Development';
+      else if (page.includes('international-service')) avenueName = 'International Service';
+      else if (page.includes('sports-and-recreational-activities')) avenueName = 'Sports and Recreational Activities';
+      else if (page.includes('membership-development')) avenueName = 'Membership Development';
+    }
 
     console.log("Loading directors for:", avenueName);
 
@@ -355,12 +362,19 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     const container = document.getElementById('avenueProjectsGrid');
     if (!container) return;
 
-    // Determine avenue from filename
+    // Determine avenue from filename or URL param
     let avenueName = '';
-    if (page.includes('community-service')) avenueName = 'Community Service';
-    else if (page.includes('club-service')) avenueName = 'Club Service';
-    else if (page.includes('professional-development')) avenueName = 'Professional Development';
-    else if (page.includes('international-service')) avenueName = 'International Service';
+    if (page === 'avenue.html') {
+      const params = new URLSearchParams(window.location.search);
+      avenueName = params.get('name');
+    } else {
+      if (page.includes('community-service')) avenueName = 'Community Service';
+      else if (page.includes('club-service')) avenueName = 'Club Service';
+      else if (page.includes('professional-development')) avenueName = 'Professional Development';
+      else if (page.includes('international-service')) avenueName = 'International Service';
+      else if (page.includes('sports-and-recreational-activities')) avenueName = 'Sports and Recreational Activities';
+      else if (page.includes('membership-development')) avenueName = 'Membership Development';
+    }
 
     if (!avenueName) return;
 
@@ -410,12 +424,19 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
   loadAvenueProjects();
 
   async function loadAvenueDetails() {
-    // Determine avenue from filename
+    // Determine avenue from filename or URL param
     let avenueName = '';
-    if (page.includes('community-service')) avenueName = 'Community Service';
-    else if (page.includes('club-service')) avenueName = 'Club Service';
-    else if (page.includes('professional-development')) avenueName = 'Professional Development';
-    else if (page.includes('international-service')) avenueName = 'International Service';
+    if (page === 'avenue.html') {
+      const params = new URLSearchParams(window.location.search);
+      avenueName = params.get('name');
+    } else {
+      if (page.includes('community-service')) avenueName = 'Community Service';
+      else if (page.includes('club-service')) avenueName = 'Club Service';
+      else if (page.includes('professional-development')) avenueName = 'Professional Development';
+      else if (page.includes('international-service')) avenueName = 'International Service';
+      else if (page.includes('sports-and-recreational-activities')) avenueName = 'Sports and Recreational Activities';
+      else if (page.includes('membership-development')) avenueName = 'Membership Development';
+    }
 
     if (!avenueName) return;
 
@@ -426,6 +447,13 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
       if (!snap.empty) {
         const data = snap.docs[0].data();
         
+        // Update Title
+        const titleEl = document.getElementById('avenueTitle');
+        if (titleEl) {
+          titleEl.textContent = data.name;
+          document.title = `${data.name} | Rotaract Club of Kandy Hill Capital`;
+        }
+
         // Update Description
         const descEl = document.getElementById('avenueDescription');
         if (descEl && data.description) {
@@ -465,10 +493,10 @@ async function loadNavbarAvenues() {
 
     // Ensure default avenues are present if DB is empty or missing them
     const defaults = [
-      { name: 'Community Service', link: 'avenues/community-service.html' },
-      { name: 'Club Service', link: 'avenues/club-service.html' },
-      { name: 'Professional Development', link: 'avenues/professional-development.html' },
-      { name: 'International Service', link: 'avenues/international-service.html' }
+      { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
+      { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
+      { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
+      { name: 'International Service', link: 'avenue.html?name=International%20Service' }
     ];
 
     defaults.forEach(def => {
@@ -481,7 +509,12 @@ async function loadNavbarAvenues() {
     // Order: Club, Community, International, Professional
     const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
     avenues.sort((a, b) => {
-      return order.indexOf(a.name) - order.indexOf(b.name);
+      const idxA = order.indexOf(a.name);
+      const idxB = order.indexOf(b.name);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.name.localeCompare(b.name);
     });
 
     // Determine prefix based on current location
@@ -508,6 +541,9 @@ async function loadNavbarAvenues() {
         } else {
            href = prefix + a.link;
         }
+      } else {
+        // Dynamic link for new avenues
+        href = `${prefix}avenue.html?name=${encodeURIComponent(a.name)}`;
       }
       
       const li = document.createElement('li');
@@ -630,6 +666,77 @@ if (page === 'blog-details.html') {
     }
   }
   loadBlogDetails();
+}
+
+// 9. Avenues List Page
+if (page === 'avenues.html' && !path.includes('/admin/')) {
+  async function loadAvenuesList() {
+    const container = document.querySelector('.avenues-grid');
+    if (!container) return;
+
+    try {
+      const snap = await getDocs(collection(db, 'avenues'));
+      let avenues = [];
+      if (!snap.empty) {
+        avenues = snap.docs.map(d => d.data());
+      }
+
+      // Ensure default avenues are present if DB is empty or missing them
+      const defaults = [
+        { name: 'Community Service', link: 'avenue.html?name=Community%20Service', description: 'Addressing the needs of the local community through impactful projects and initiatives.', icon: 'fa-hands-helping' },
+        { name: 'Club Service', link: 'avenue.html?name=Club%20Service', description: 'Fostering fellowship among members and strengthening the functioning of the club.', icon: 'fa-users' },
+        { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fa-briefcase' },
+        { name: 'International Service', link: 'avenue.html?name=International%20Service', description: 'Promoting international understanding and goodwill through global projects and partnerships.', icon: 'fa-globe' }
+      ];
+
+      defaults.forEach(def => {
+        if (!avenues.find(a => a.name === def.name)) {
+          avenues.push(def);
+        }
+      });
+
+      // Sort avenues
+      const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
+      avenues.sort((a, b) => {
+        const idxA = order.indexOf(a.name);
+        const idxB = order.indexOf(b.name);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      container.innerHTML = '';
+      avenues.forEach((a, index) => {
+        let href = '#';
+        if (a.link) {
+           href = a.link;
+        } else {
+           href = `avenue.html?name=${encodeURIComponent(a.name)}`;
+        }
+
+        // Default icon if not present
+        const iconClass = a.icon || 'fa-star';
+
+        const html = `
+          <div class="avenue-item" data-aos="fade-up" data-aos-delay="${index * 100}">
+            <div class="avenue-icon"><i class="fas ${iconClass}"></i></div>
+            <div class="avenue-label">
+              <a href="${href}">${escapeHtml(a.name)}</a>
+            </div>
+            <p>
+              ${escapeHtml(a.description || '')}
+            </p>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+      });
+
+    } catch (e) {
+      console.error("Error loading avenues list", e);
+    }
+  }
+  loadAvenuesList();
 }
 
 loadNavbarAvenues();
