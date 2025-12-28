@@ -554,6 +554,7 @@ if (page === 'avenues.html') {
   const list = document.getElementById('avenuesList');
   const form = document.getElementById('avenueForm');
   const nameInput = document.getElementById('avenueName');
+  const iconInput = document.getElementById('avenueIcon');
   const imageInput = document.getElementById('avenueImage');
   const descInput = document.getElementById('avenueDescription');
   const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
@@ -606,6 +607,7 @@ if (page === 'avenues.html') {
       
       const data = { 
         name: nameInput.value,
+        icon: iconInput ? iconInput.value : '',
         imageUrl: imageInput ? imageInput.value : '',
         description: descInput ? descInput.value : '',
         stat1Label: stat1Label ? stat1Label.value : '',
@@ -650,6 +652,7 @@ if (page === 'avenues.html') {
         const snap = await getDocs(collection(db, 'avenues'));
         const avenue = snap.docs.find(d => d.id === id).data();
         nameInput.value = avenue.name;
+        if(iconInput) iconInput.value = avenue.icon || '';
         if(imageInput) imageInput.value = avenue.imageUrl || '';
         if(descInput) descInput.value = avenue.description || '';
         if(stat1Label) stat1Label.value = avenue.stat1Label || '';

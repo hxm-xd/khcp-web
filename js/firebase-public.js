@@ -459,6 +459,14 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             heroEl.style.background = 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)';
         }
 
+        // Update Icon
+        const iconEl = document.getElementById('avenueIcon');
+        if (iconEl && data.icon) {
+            iconEl.className = escapeHtml(data.icon);
+        } else if (iconEl) {
+            iconEl.className = 'fas fa-star'; // Default
+        }
+
         // Update Description
         const descEl = document.getElementById('avenueDescription');
         if (descEl && data.description) {
