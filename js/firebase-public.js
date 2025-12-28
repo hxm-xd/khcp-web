@@ -519,16 +519,35 @@ async function loadNavbarAvenues() {
     ];
 
     defaults.forEach(def => {
-      if (!avenues.find(a => a.name === def.name)) {
+      // Check for existence using normalized names to avoid duplicates
+      const exists = avenues.some(a => 
+        a.name && a.name.trim().toLowerCase() === def.name.trim().toLowerCase()
+      );
+      if (!exists) {
         avenues.push(def);
       }
     });
     
+    // Remove any duplicates that might exist in the DB itself
+    const uniqueAvenues = [];
+    const seenNames = new Set();
+    avenues.forEach(a => {
+        if (!a.name) return;
+        const normalized = a.name.trim().toLowerCase();
+        if (!seenNames.has(normalized)) {
+            seenNames.add(normalized);
+            uniqueAvenues.push(a);
+        }
+    });
+    avenues = uniqueAvenues;
+
     // Sort avenues to ensure consistent order
     // Order: Club, Community, International, Professional
     const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
     avenues.sort((a, b) => {
-      return order.indexOf(a.name) - order.indexOf(b.name);
+      const nameA = a.name ? a.name.trim() : '';
+      const nameB = b.name ? b.name.trim() : '';
+      return order.indexOf(nameA) - order.indexOf(nameB);
     });
 
     // Determine prefix based on current location
@@ -603,16 +622,34 @@ if (page === 'avenues.html') {
 
       // Merge defaults if not present
       defaults.forEach(def => {
-        if (!avenues.find(a => a.name === def.name)) {
+        const exists = avenues.some(a => 
+            a.name && a.name.trim().toLowerCase() === def.name.trim().toLowerCase()
+        );
+        if (!exists) {
           avenues.push(def);
         }
       });
 
+      // Remove any duplicates that might exist in the DB itself
+      const uniqueAvenues = [];
+      const seenNames = new Set();
+      avenues.forEach(a => {
+          if (!a.name) return;
+          const normalized = a.name.trim().toLowerCase();
+          if (!seenNames.has(normalized)) {
+              seenNames.add(normalized);
+              uniqueAvenues.push(a);
+          }
+      });
+      avenues = uniqueAvenues;
+
       // Sort
       const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
       avenues.sort((a, b) => {
-         let idxA = order.indexOf(a.name);
-         let idxB = order.indexOf(b.name);
+         const nameA = a.name ? a.name.trim() : '';
+         const nameB = b.name ? b.name.trim() : '';
+         let idxA = order.indexOf(nameA);
+         let idxB = order.indexOf(nameB);
          if (idxA === -1) idxA = 99;
          if (idxB === -1) idxB = 99;
          return idxA - idxB;
