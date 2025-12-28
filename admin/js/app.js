@@ -85,7 +85,7 @@ function renderSkeleton(container, count = 3) {
 async function seedAvenues() {
   try {
     const snap = await getDocs(collection(db, 'avenues'));
-    const existingNames = snap.docs.map(d => d.data().name);
+    const existingNames = snap.docs.map(d => (d.data().name || '').trim().toLowerCase());
     
     const defaults = [
       { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
@@ -96,7 +96,7 @@ async function seedAvenues() {
 
     let added = false;
     for (const a of defaults) {
-      if (!existingNames.includes(a.name)) {
+      if (!existingNames.includes(a.name.toLowerCase())) {
         await addDoc(collection(db, 'avenues'), a);
         added = true;
       }
