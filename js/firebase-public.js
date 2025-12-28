@@ -283,6 +283,8 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     else if (page.includes('club-service')) avenueName = 'Club Service';
     else if (page.includes('professional-development')) avenueName = 'Professional Development';
     else if (page.includes('international-service')) avenueName = 'International Service';
+    else if (page.includes('sports-and-recreational-activities')) avenueName = 'Sports and Recreational Activities';
+    else if (page.includes('membership-development')) avenueName = 'Membership Development';
 
     console.log("Loading directors for:", avenueName);
 
@@ -369,6 +371,8 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     else if (page.includes('club-service')) avenueName = 'Club Service';
     else if (page.includes('professional-development')) avenueName = 'Professional Development';
     else if (page.includes('international-service')) avenueName = 'International Service';
+    else if (page.includes('sports-and-recreational-activities')) avenueName = 'Sports and Recreational Activities';
+    else if (page.includes('membership-development')) avenueName = 'Membership Development';
 
     if (!avenueName) return;
 
@@ -427,6 +431,8 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
     else if (page.includes('club-service')) avenueName = 'Club Service';
     else if (page.includes('professional-development')) avenueName = 'Professional Development';
     else if (page.includes('international-service')) avenueName = 'International Service';
+    else if (page.includes('sports-and-recreational-activities')) avenueName = 'Sports and Recreational Activities';
+    else if (page.includes('membership-development')) avenueName = 'Membership Development';
 
     if (!avenueName) return;
 
@@ -515,7 +521,9 @@ async function loadNavbarAvenues() {
       { name: 'Community Service', link: 'avenue.html?name=Community%20Service' },
       { name: 'Club Service', link: 'avenue.html?name=Club%20Service' },
       { name: 'Professional Development', link: 'avenue.html?name=Professional%20Development' },
-      { name: 'International Service', link: 'avenue.html?name=International%20Service' }
+      { name: 'International Service', link: 'avenue.html?name=International%20Service' },
+      { name: 'Sports and Recreational Activities', link: 'avenue.html?name=Sports%20and%20Recreational%20Activities' },
+      { name: 'Membership Development', link: 'avenue.html?name=Membership%20Development' }
     ];
 
     defaults.forEach(def => {
@@ -543,7 +551,7 @@ async function loadNavbarAvenues() {
 
     // Sort avenues to ensure consistent order
     // Order: Club, Community, International, Professional
-    const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
+    const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development', 'Sports and Recreational Activities', 'Membership Development'];
     avenues.sort((a, b) => {
       const nameA = a.name ? a.name.trim() : '';
       const nameB = b.name ? b.name.trim() : '';
@@ -617,7 +625,9 @@ if (page === 'avenues.html') {
         { name: 'Club Service', description: 'Fostering fellowship among members and strengthening the functioning of the club.', icon: 'fas fa-users' },
         { name: 'Community Service', description: 'Addressing the needs of the local community through impactful projects and initiatives.', icon: 'fas fa-hands-helping' },
         { name: 'International Service', description: 'Promoting international understanding and goodwill through global projects and partnerships.', icon: 'fas fa-globe' },
-        { name: 'Professional Development', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fas fa-briefcase' }
+        { name: 'Professional Development', description: 'Enhancing the skills and leadership abilities of members for personal and professional growth.', icon: 'fas fa-briefcase' },
+        { name: 'Sports and Recreational Activities', description: 'Promoting physical well-being and team spirit through sports and recreational events.', icon: 'fas fa-running' },
+        { name: 'Membership Development', description: 'Focusing on the recruitment and retention of members to ensure the club\'s growth and sustainability.', icon: 'fas fa-user-plus' }
       ];
 
       // Merge defaults if not present
@@ -644,7 +654,7 @@ if (page === 'avenues.html') {
       avenues = uniqueAvenues;
 
       // Sort
-      const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development'];
+      const order = ['Club Service', 'Community Service', 'International Service', 'Professional Development', 'Sports and Recreational Activities', 'Membership Development'];
       avenues.sort((a, b) => {
          const nameA = a.name ? a.name.trim() : '';
          const nameB = b.name ? b.name.trim() : '';

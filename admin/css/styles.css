@@ -57,6 +57,7 @@ body {
     height: var(--header-height);
     display: flex;
     align-items: center;
+    justify-content: center;
     padding: 0 1.5rem;
     border-bottom: 1px solid var(--border);
 }
@@ -69,6 +70,10 @@ body {
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
+}
+
+.sidebar-header .brand img {
+    transform: scale(3.5);
 }
 
 .sidebar-nav {
