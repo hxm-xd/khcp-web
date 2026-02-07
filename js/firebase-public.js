@@ -117,8 +117,8 @@ if (page === 'index.html' || page === '' || page === 'about.html') {
 
         const html = `
           <div class="project-card" data-aos="fade-up">
-            <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-hands-helping"></i>'}
+            <div class="project-image ${p.imageUrl ? '' : 'placeholder'}">
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-hands-helping\'></i>';this.parentElement.classList.add('placeholder')">` : '<i class="fas fa-hands-helping"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
@@ -184,8 +184,8 @@ if (page === 'blog.html') {
         
         const html = `
           <div class="project-card" data-aos="fade-up">
-            <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-pen-nib"></i>'}
+            <div class="project-image ${p.imageUrl ? '' : 'placeholder'}">
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-pen-nib\'></i>';this.parentElement.classList.add('placeholder')">` : '<i class="fas fa-pen-nib"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
@@ -255,8 +255,8 @@ if (page === 'projects.html') {
                  const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                  return `
                 <div class="project-card" data-aos="fade-up">
-                  <div class="project-image">
-                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-project-diagram"></i>'}
+                  <div class="project-image ${p.imageUrl ? '' : 'placeholder'}">
+                    ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-project-diagram\'></i>';this.parentElement.classList.add('placeholder')">` : '<i class="fas fa-project-diagram"></i>'}
                   </div>
                   <div class="project-content">
                     <h3>${escapeHtml(p.title)}</h3>
@@ -368,7 +368,7 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
             <ul class="director-list">
               ${list.map(d => `
                 <li class="director">
-                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" class="director-img">` : ''}
+                  ${d.imageUrl ? `<img src="${escapeHtml(d.imageUrl)}" alt="${escapeHtml(d.name)}" class="director-img" onerror="this.style.display='none'">` : ''}
                   <div>
                     <div class="director-name">${escapeHtml(d.name)}</div>
                     <div class="director-role">${escapeHtml(d.avenue)} Director</div>
@@ -428,8 +428,8 @@ if (path.includes('/avenues/') || page.includes('service') || page.includes('dev
         
         const html = `
           <div class="project-card" data-aos="fade-up">
-            <div class="project-image">
-              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}">` : '<i class="fas fa-project-diagram"></i>'}
+            <div class="project-image ${p.imageUrl ? '' : 'placeholder'}">
+              ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" onerror="this.parentElement.innerHTML='<i class=\'fas fa-project-diagram\'></i>';this.parentElement.classList.add('placeholder')">` : '<i class="fas fa-project-diagram"></i>'}
             </div>
             <div class="project-content">
               <h3>${escapeHtml(p.title)}</h3>
@@ -791,7 +791,7 @@ if (page === 'project-details.html') {
           
           ${p.imageUrl ? `
           <div data-aos="fade-up" data-aos-delay="100">
-            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" class="detail-image">
+            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" class="detail-image" onerror="this.parentElement.style.display='none'">
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">
@@ -846,7 +846,7 @@ if (page === 'blog-details.html') {
           
           ${p.imageUrl ? `
           <div data-aos="fade-up" data-aos-delay="100">
-            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" class="detail-image">
+            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(p.title)}" class="detail-image" onerror="this.parentElement.style.display='none'">
           </div>` : ''}
 
           <div class="detail-content" data-aos="fade-up" data-aos-delay="200">

@@ -76,8 +76,8 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: none;
 }
 
-.sidebar-header .brand img {
-    height: 40px;
+.sidebar-logo {
+    height: 2.5rem;
     width: auto;
 }
 

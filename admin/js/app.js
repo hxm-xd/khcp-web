@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAR97VU9ug7TVOLpzY1Tz1NkOjbrzrfQWk",
@@ -16,6 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 const page = window.location.pathname.split('/').pop();
 
@@ -80,6 +82,108 @@ function renderSkeleton(container, count = 3) {
     `;
     container.appendChild(el);
   }
+}
+
+// --- Storage Helpers ---
+
+async function uploadImage(file, path = 'uploads') {
+  if (!file) return null;
+  const timestamp = Date.now();
+  // Sanitize filename
+  const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+  const storageRef = ref(storage, `${path}/${timestamp}_${cleanName}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+  
+  return new Promise((resolve, reject) => {
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        // Optional: update UI with progress
+      }, 
+      (error) => {
+        console.error("Upload failed", error);
+        reject(error);
+      }, 
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          resolve(downloadURL);
+        });
+      }
+    );
+  });
+}
+
+function setupImageUploader(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  
+  // Check if already setup
+  if (input.dataset.uploadSetup === 'true') return;
+  input.dataset.uploadSetup = 'true';
+  
+  // Create wrapper
+  const wrapper = document.createElement('div');
+  wrapper.style.marginBottom = '10px';
+  wrapper.style.display = 'flex';
+  wrapper.style.gap = '10px';
+  wrapper.style.alignItems = 'center';
+  
+  // Create file input
+  const fileParams = document.createElement('input');
+  fileParams.type = 'file';
+  fileParams.id = inputId + '_file';
+  fileParams.accept = 'image/*';
+  fileParams.style.display = 'none'; // hide default
+  
+  // Create button
+  const uploadBtn = document.createElement('button');
+  uploadBtn.type = 'button'; // prevent form submit
+  uploadBtn.className = 'btn btn-secondary';
+  uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Image';
+  uploadBtn.style.padding = '0.5rem 1rem';
+  uploadBtn.style.fontSize = '0.9rem';
+  uploadBtn.onclick = () => fileParams.click();
+  
+  // Status text
+  const status = document.createElement('span');
+  status.style.fontSize = '0.9rem';
+  status.style.color = '#666';
+  
+  wrapper.appendChild(uploadBtn);
+  wrapper.appendChild(status);
+  wrapper.appendChild(fileParams);
+  
+  // Insert before the text input
+  // If input is in a form-group/label block, try to insert inside that block for better spacing
+  // or just before the input itself.
+  input.parentNode.insertBefore(wrapper, input);
+  
+  fileParams.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      status.textContent = 'Uploading...';
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+      
+      try {
+          const url = await uploadImage(file);
+          input.value = url;
+          status.textContent = 'Uploaded!';
+          status.style.color = '#10b981';
+          uploadBtn.innerHTML = '<i class="fas fa-check"></i> Done';
+          setTimeout(() => {
+             uploadBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload Image';
+             uploadBtn.disabled = false;
+          }, 2000);
+      } catch (err) {
+          console.error(err);
+          status.textContent = 'Failed';
+          status.style.color = '#ef4444';
+          uploadBtn.innerHTML = '<i class="fas fa-times"></i> Error';
+          uploadBtn.disabled = false;
+      }
+  });
 }
 
 let isSeeding = false;
@@ -387,6 +491,9 @@ if (page === 'blog.html') {
     });
   }
 
+  // Setup Image Upload
+  setupImageUploader('postImage');
+
   async function loadPosts() {
     renderSkeleton(list);
     try {
@@ -513,6 +620,9 @@ if (page === 'projects.html') {
     });
   }
 
+  // Setup Image Upload
+  setupImageUploader('projectImage');
+
   populateAvenueSelect('projectAvenue');
 
   async function loadProjects() {
@@ -628,6 +738,9 @@ if (page === 'avenues.html') {
   const stat1Value = document.getElementById('stat1Value');
   const stat2Label = document.getElementById('stat2Label');
   const stat2Value = document.getElementById('stat2Value');
+
+  // Setup Image Upload
+  setupImageUploader('avenueImage');
 
   if (createBtn) {
     createBtn.addEventListener('click', () => {
@@ -768,6 +881,9 @@ if (page === 'directors.html') {
 
   populateAvenueSelect('directorAvenue');
   populateAvenueSelect('filterAvenue');
+
+  // Setup Image Upload
+  setupImageUploader('directorImage');
 
   async function loadDirectors() {
     renderSkeleton(list);
